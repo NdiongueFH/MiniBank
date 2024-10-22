@@ -45,18 +45,6 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" style="font-size: 1.25rem; color: #505887;">
-                            <i class="bi bi-bar-chart"></i>
-                            Paiments
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="font-size: 1.25rem; color: #505887;">
-                            <i class="bi bi-credit-card"></i>
-                            Crédit
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="font-size: 1.25rem; color: #505887;">
                             <i class="bi bi-gear"></i>
                             Paramètres
                         </a>
@@ -112,7 +100,7 @@
 
             <!-- Dashboard Content -->
             <div class="container mt-4">
-                <h1>Dashboard</h1>
+                <h1>Dashboard Distributeur</h1>
                 <p>Bienvenue sur le tableau de bord de MiniBank.</p>
                 <!-- Ajouter d'autres contenus ici -->
             </div>

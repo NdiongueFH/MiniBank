@@ -7,8 +7,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/side-nav', function () {
-    return view('layouts.sidebar-navbar'); // afficheage sidebar et navbar
+Route::get('/side-navC', function () {
+    return view('layouts.sidebar-navbarC'); // afficheage sidebar et navbar
+});
+
+Route::get('/side-navA', function () {
+    return view('layouts.sidebar-navbarA'); // afficheage sidebar et navbar
+});
+
+Route::get('/side-navD', function () {
+    return view('layouts.sidebar-navbarD'); // afficheage sidebar et navbar
 });
 
 Route::get('/dashboard', function () {
