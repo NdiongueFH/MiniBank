@@ -11,6 +11,8 @@
 
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+ 
 </head>
 <body>
 
@@ -49,7 +51,7 @@
                             Paramètres
                         </a>
                     </li>
-                </ul>
+                </ul>   
 
                 <!-- Déconnexion button (aligned at the bottom) -->
                 <div class="mt-auto mb-3 px-3">
@@ -61,7 +63,7 @@
         </nav>
 
         <!-- Main content -->
-        <div class="main-content flex-grow-1" style="margin-left: 240px; width: calc(100% - 240px);">
+        <div class="main-content flex-grow-1" style="margin-left: 240px; width: calc(100% - 240px);background-color: #E5E5E5;">
             <!-- Navbar -->
             <nav class="navbar navbar-expand-lg navbar-light bg-primary">
                 <div class="container-fluid">
@@ -101,7 +103,9 @@
             <!-- Dashboard Content -->
             <div class="container mt-4">
                 <h1>Dashboard Distributeur</h1>
-                <p>Bienvenue sur le tableau de bord de MiniBank.</p>
+                <h2>Bienvenue, {{ auth()->user()->prenom }} !</h2>
+                @yield('content')
+
                 <!-- Ajouter d'autres contenus ici -->
             </div>
         </div>
