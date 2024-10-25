@@ -2,47 +2,66 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Spatie\Permission\Traits\HasRoles;
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\Compte;
+use App\Models\Transaction;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'name',
+        'prenom',
+        'nom',
+        'telephone',
         'email',
+        'num_compte',
+        'adresse',
+        'carte_identite',
+        'photo',
+        'date_naissance',
         'password',
+        'blocked',
+        'role',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected static function boot()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        parent::boot();
+
+        // Générer le numéro de compte avant de créer un utilisateur
+        static::creating(function ($user) {
+            $user->num_compte = self::generateAccountNumber($user->role);
+            $user->password = bcrypt($user->password); // Hacher le mot de passe
+        });
     }
+
+    private static function generateAccountNumber($role)
+    {
+        return strtoupper(substr($role, 0, 3)) . date('Y') . rand(1000, 9999);
+    }
+
+    // app/Models/User.php
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'distributeur_id');
+    }
+
+    public function compte()
+    {
+        return $this->hasOne(Compte::class, 'user_id');
+    }
+
 }
+
+
