@@ -148,44 +148,49 @@
 
            
         <!-- Modal pour le dépôt -->
-        <div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header text-center">
-                        <h5 class="modal-title w-100" id="depositModalLabel">Menu de dépôt</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered"> <!-- Taille du modal -->
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title w-100" id="depositModalLabel">Menu de dépôt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column align-items-center"> <!-- Alignement centré -->
+                <!-- Image ajoutée ici -->
+                <img src="{{ asset('images/Minibank.png') }}" alt="Logo" class="img-fluid mx-auto d-block" width="300" style="margin-bottom: 20px;">
+                
+                <!-- Formulaire de dépôt -->
+                <form id="depositForm" class="flex-grow-1 w-100 text-center" method="POST" action="{{ route('deposer') }}">
+                    @csrf
+                    <div class="mb-3 d-flex flex-column align-items-center">
+                        <label for="depositAccount" class="form-label">Numéro de compte</label>
+                        <input type="text" class="form-control mx-auto" id="depositAccount" name="account_number" placeholder="Saisir un numéro de compte" style="width: 70%;" required>
                     </div>
-                    <div class="modal-body d-flex">
-                        
-                        <!-- Formulaire de dépôt -->
-                        <form id="depositForm" class="flex-grow-1" method="POST" action="{{ route('deposer') }}">
-                            @csrf
-                            <div class="mb-3 text-center">
-                                <label for="depositAccount" class="form-label">Numéro de compte</label>
-                                <input type="text" class="form-control mx-auto" id="depositAccount" name="account_number" placeholder="Saisir un numéro de compte" style="width: 80%;" required>
-                            </div>
-                            <div class="mb-3 text-center">
-                                <label for="depositAmount" class="form-label">Montant à déposer</label>
-                                <input type="number" class="form-control mx-auto" id="depositAmount" name="amount" placeholder="Montant à déposer" style="width: 80%;" required>
-                                <div id="errorMessage" class="text-danger" style="display: none; margin-top: 10px;">
-                                    *Le montant à déposer doit être supérieur ou égal à 1000.
-                                </div>
+                    <div class="mb-3 d-flex flex-column align-items-center">
+                        <label for="depositAmount" class="form-label">Montant à déposer</label>
+                        <input type="number" class="form-control mx-auto" id="depositAmount" name="amount" placeholder="Montant à déposer" style="width: 70%;" required>
+                        <div id="errorMessage" class="text-danger" style="display: none; margin-top: 10px;">
+                            *Le montant à déposer doit être supérieur ou égal à 1000.
+                        </div>
 
-                                <div id="balanceErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
-                                    *Le montant à déposer ne peut pas dépasser votre solde actuel de {{ number_format($compte->solde, 2) }} FCFA.
-                                </div>
-                            </div>
-                            <div class="text-center" style="color: blue; margin-bottom: 20px;">
-                                Bonus = 1%
-                            </div>
-                            <div class="d-flex justify-content-center">
-                                <button type="submit" class="btn btn-primary">Déposer</button>
-                            </div>
-                        </form>
+                        <div id="balanceErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
+                            *Le montant à déposer ne peut pas dépasser votre solde actuel de {{ number_format($compte->solde, 2) }} FCFA.
+                        </div>
                     </div>
-                </div>
+                    <div class="text-center" style="color: blue; margin-bottom: 20px;">
+                        Bonus = 1%
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary">Déposer</button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
+</div>
+
+
+
 
         <script>
             document.getElementById('depositForm').addEventListener('submit', function(event) {
@@ -239,45 +244,48 @@
             });
             </script>
             
-        <!-- Modal pour le retrait -->
-        <div class="modal fade" id="withdrawalModal" tabindex="-1" aria-labelledby="withdrawalModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header text-center">
-                        <h5 class="modal-title w-100" id="withdrawalModalLabel">Menu de retrait</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body d-flex">
-                        <!-- Formulaire de retrait -->
-                        <form id="withdrawalForm" class="flex-grow-1" method="POST" action="{{ route('retirer') }}">
-                            @csrf
-                            <div class="mb-3 text-center">
-                                <label for="withdrawalAccount" class="form-label">Numéro de compte</label>
-                                <input type="text" class="form-control mx-auto" id="withdrawalAccount" name="account_number" placeholder="Saisir un numéro de compte" style="width: 80%;" required>
-                            </div>
-                            <div class="mb-3 text-center">
-                                <label for="withdrawalAmount" class="form-label">Montant à retirer</label>
-                                <input type="number" class="form-control mx-auto" id="withdrawalAmount" name="amount" placeholder="Montant à retirer" style="width: 80%;" required>
-                                <div id="withdrawalErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
-                                    *Le montant à retirer doit être supérieur ou égal à 1000.
-                                </div>
-                                <div id="withdrawalBalanceErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
-                                    *Le montant à retirer ne peut pas dépasser votre solde actuel.
-                                </div>
-                            </div>
+       <!-- Modal pour le retrait -->
+<div class="modal fade" id="withdrawalModal" tabindex="-1" aria-labelledby="withdrawalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered"> <!-- Taille du modal -->
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title w-100" id="withdrawalModalLabel">Menu de retrait</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column align-items-center"> <!-- Alignement centré -->
+                <!-- Image ajoutée ici -->
+                <img src="{{ asset('images/Minibank.png') }}" alt="Logo" class="img-fluid mx-auto d-block" width="300" style="margin-bottom: 20px;">
 
-                            <div class="text-center" style="color: blue; margin-bottom: 20px;">
-                                Bonus = 1%
-                            </div>
-                            
-                            <div class="d-flex justify-content-center">
-                                <button type="submit" class="btn btn-primary">Retirer</button>
-                            </div>
-                        </form>
+                <!-- Formulaire de retrait -->
+                <form id="withdrawalForm" class="flex-grow-1 w-100 text-center" method="POST" action="{{ route('retirer') }}">
+                    @csrf
+                    <div class="mb-3 d-flex flex-column align-items-center">
+                        <label for="withdrawalAccount" class="form-label">Numéro de compte</label>
+                        <input type="text" class="form-control mx-auto" id="withdrawalAccount" name="account_number" placeholder="Saisir un numéro de compte" style="width: 70%;" required>
                     </div>
-                </div>
+                    <div class="mb-3 d-flex flex-column align-items-center">
+                        <label for="withdrawalAmount" class="form-label">Montant à retirer</label>
+                        <input type="number" class="form-control mx-auto" id="withdrawalAmount" name="amount" placeholder="Montant à retirer" style="width: 70%;" required>
+                        <div id="withdrawalErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
+                            *Le montant à retirer doit être supérieur ou égal à 1000.
+                        </div>
+                        <div id="withdrawalBalanceErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
+                            *Le montant à retirer ne peut pas dépasser votre solde actuel.
+                        </div>
+                    </div>
+
+                    <div class="text-center" style="color: blue; margin-bottom: 20px;">
+                        Bonus = 1%
+                    </div>
+                    
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary">Retirer</button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
+</div>
 
         <script>
             document.getElementById('withdrawalAccount').addEventListener('input', function() {

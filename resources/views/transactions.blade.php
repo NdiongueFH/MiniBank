@@ -137,12 +137,53 @@
 
             </div>
 
-           <!-- Bloc de transfert -->
-            <div class="transfer-button" style="width: 300px; height: 120px; background-color: #2D60FF; color: white; border-radius: 40px; display: flex; align-items: center; justify-content: center; margin-left: 1000px; margin-top: -200px;">
-                <img src="{{ asset('images/transferer.png') }}" alt="Transférer" style="width: 40px; height: 40px; margin-right: 10px;">
-                <h5 style="margin: 0;">Transférer</h5>
-            </div>
+      <!-- Bloc de transfert -->
+<div class="transfer-button" style="width: 300px; height: 120px; background-color: #2D60FF; color: white; border-radius: 40px; display: flex; align-items: center; justify-content: center; margin-left: 1000px; margin-top: -200px;" onclick="openModal()">
+    <img src="{{ asset('images/transferer.png') }}" alt="Transférer" style="width: 40px; height: 40px; margin-right: 10px;">
+    <h5 style="margin: 0;">Transférer</h5>
+</div>
 
+<!-- Modal -->
+<div id="transferModal" class="modal" style="display:none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="modal-content" style="padding: 40px; border-radius: 20px; background-color: white; width: 600px; margin: auto; position: relative; top: 50px;">
+        <span class="close" onclick="closeModal()" style="position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 20px;">&times;</span>
+        
+        <!-- Image en haut du modal -->
+        <img src="{{ asset('images/Minibank.png') }}" alt="Logo" style="display: block; width: 300px; margin: 0 auto 20px auto;">
+        
+        <h2 style="text-align: center;">Transférer de l'argent</h2>
+        <form id="transferForm">
+            <label for="numero_compte">Numéro de compte:</label>
+            <input type="text" id="numero_compte" name="numero_compte" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+            
+            <label for="montant_envoye">Montant envoyé:</label>
+            <input type="number" id="montant_envoye" name="montant_envoye" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+            
+            <label for="montant_recu">Montant reçu:</label>
+            <input type="number" id="montant_recu" name="montant_recu" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+
+            <button type="submit" style="width: 100%; background-color: #2D60FF; color: white; border: none; border-radius: 5px; padding: 10px;">Confirmer</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal() {
+    document.getElementById('transferModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('transferModal').style.display = 'none';
+}
+
+// Fermer le modal en cliquant en dehors de celui-ci
+window.onclick = function(event) {
+    var modal = document.getElementById('transferModal');
+    if (event.target == modal) {
+        closeModal();
+    }
+}
+</script>
 
         </div>
     </div>

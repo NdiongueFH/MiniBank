@@ -19,7 +19,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 
 
 // Route pour le tableau de bord client
-Route::get('/client/dashboard', [ClientController::class, 'index'])->name('client.dashboard')->middleware('auth');
+Route::get('/client/dashboard', [ClientController::class, 'index'])->name('client.dashboard')->middleware(middleware: 'auth');
 
 
 
