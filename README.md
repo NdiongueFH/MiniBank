@@ -21,9 +21,9 @@ Ce projet consiste en une plateforme web de gestion de transactions d'argent pou
 
 ## Technologies Utilisées
 
-- **Langage** : [Préciser le langage utilisé, par exemple PHP, JavaScript]
-- **Framework** : [Préciser le framework utilisé, par exemple Laravel]
-- **Base de Données** : [Préciser le système de base de données, par exemple MySQL]
+- **Langage** : [PHP,HTML,CSS JavaScript]
+- **Framework** : [Bootstrap, Laravel]
+- **Base de Données** : [MySQL]
 
 ## Installation
 
