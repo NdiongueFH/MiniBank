@@ -29,8 +29,8 @@ Ce projet consiste en une plateforme web de gestion de transactions d'argent pou
 
 1. Clonez le dépôt :
    ```bash
-   git clone https://github.com/username/nom-du-repo.git
-   cd nom-du-repo
+   git clone git@github.com:NdiongueFH/MiniBank.git
+   cd MiniBank
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
