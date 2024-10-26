@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Compte;
 use App\Models\Transaction;
+use App\Models\Client;
+use Exception;
+
+
 
 class TransactionController extends Controller
 {
@@ -92,17 +96,61 @@ class TransactionController extends Controller
         return redirect()->back()->with('success', 'Retrait effectué avec succès !');
     }
 
-    
-    public function showWithdrawalForm($userId)
+    public function annulerTransaction($id)
     {
-        // Récupérer l'utilisateur par son ID
-        $client = User::findOrFail($userId);
-
-        // Récupérer le compte associé à l'utilisateur
-        $clientAccount = Compte::where('user_id', $client->id)->first();
-
-        // Passer la variable à la vue
-        return view('distributeur_transactions', compact('clientAccount'));
+        // Trouver la transaction
+        $transaction = Transaction::find($id);
+    
+        // Vérifiez si la transaction existe et si elle peut être annulée
+        if (!$transaction || $transaction->annule || $transaction->expires_at < now()) {
+            throw new Exception("La transaction ne peut pas être annulée.");
+        }
+    
+        // Mettre à jour le statut et l'annulation de la transaction
+        $transaction->update(['annule' => true, 'statut' => 'annulé']);
+    
+        // Mettre à jour les comptes en fonction du type de transaction
+        $emetteur = $transaction->emetteur; // L'émetteur de la transaction
+        $receveur = $transaction->receveur; // Le receveur de la transaction
+        $distributeur = $transaction->distributeur; // Le distributeur
+    
+        // Récupérer le compte du distributeur
+        $compteDistributeur = Compte::where('user_id', $distributeur->id)->first();
+        
+        if ($transaction->type === 'transfert') {
+            // Remboursement à l'émetteur
+            $montant = $transaction->mountant;
+    
+            // Récupérer le compte de l'émetteur et du receveur
+            $compteEmetteur = Compte::where('user_id', $emetteur->id)->first();
+            $compteReceveur = Compte::where('user_id', $receveur->id)->first();
+    
+            // Mettre à jour le solde de l'émetteur et du receveur
+            $compteEmetteur->increment('solde', $montant);
+            $compteReceveur->decrement('solde', $montant);
+    
+        } elseif ($transaction->type === 'depot') {
+            // Retirer le montant et le bonus de 1% du distributeur
+            $montant = $transaction->mountant;
+            $bonus = $montant * 0.01;
+    
+            // Mettre à jour le solde du distributeur
+            $compteDistributeur->decrement('solde', $montant + $bonus);
+    
+        } elseif ($transaction->type === 'retrait') {
+            // Retirer le montant et le bonus de 1% du distributeur
+            $montant = $transaction->mountant;
+            $bonus = $montant * 0.01;
+    
+            // Récupérer le compte du client (receveur)
+            $compteReceveur = Compte::where('user_id', $receveur->id)->first();
+    
+            // Mettre à jour le solde du client et du distributeur
+            $compteReceveur->decrement('solde', $montant);
+            $compteDistributeur->decrement('solde', $bonus);
+        }
+    
+        return response()->json(['message' => 'Transaction annulée avec succès.'], 200);
     }
 
     public function index()
@@ -158,5 +206,8 @@ class TransactionController extends Controller
         return response()->json(['error' => 'Transaction non trouvée'], 404);
     }
 }
+
+
+
 
 }

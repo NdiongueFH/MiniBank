@@ -8,6 +8,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 
+
 Route::get('/users/{id}/compte', [UserController::class, 'getCompte']);
 
 // ...
@@ -24,6 +25,7 @@ Route::get('/client/dashboard', [ClientController::class, 'index'])->name('clien
 
 Route::post('/deposer', [TransactionController::class, 'deposer'])->name('deposer');
 Route::post('/retirer', [TransactionController::class, 'retirer'])->name('retirer');
+Route::post('/annuler-transaction', [TransactionController::class, 'annulerTransaction'])->name('annuler.transaction');
 
 Route::get('/client/search', [ClientController::class, 'search'])->name('client.search');
 

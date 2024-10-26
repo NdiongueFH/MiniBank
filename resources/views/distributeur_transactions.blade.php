@@ -141,202 +141,235 @@
                     <h5 style="margin: 0;">Retrait</h5>
                 </div>
 
-                 <!-- Bloc d'annulation -->
-    <div class="transfer-button" style="width: 300px; height: 120px; background-color: #D61E33; color: white; border-radius: 60px; display: flex; align-items: center; justify-content: center; position: absolute; top: 230px; left: 1500px;" data-bs-toggle="modal" data-bs-target="#withdrawalModal">
-        <img src="{{ asset('images/transferer.png') }}" alt="Transférer" style="width: 40px; height: 40px; margin-right: 15px;">
-        <h5 style="margin: 0;">Annulation</h5>
-    </div>
-
-            </div>
+        </div>
 
 
             
 
            
- <!-- Modal pour le dépôt -->
-<div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header text-center">
-                <h5 class="modal-title w-100" id="depositModalLabel">Menu de dépôt</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body d-flex">
-                
-                <!-- Formulaire de dépôt -->
-                <form id="depositForm" class="flex-grow-1" method="POST" action="{{ route('deposer') }}">
-                    @csrf
-                    <div class="mb-3 text-center">
-                        <label for="depositAccount" class="form-label">Numéro de compte</label>
-                        <input type="text" class="form-control mx-auto" id="depositAccount" name="account_number" placeholder="Saisir un numéro de compte" style="width: 80%;" required>
+        <!-- Modal pour le dépôt -->
+        <div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header text-center">
+                        <h5 class="modal-title w-100" id="depositModalLabel">Menu de dépôt</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="mb-3 text-center">
-                        <label for="depositAmount" class="form-label">Montant à déposer</label>
-                        <input type="number" class="form-control mx-auto" id="depositAmount" name="amount" placeholder="Montant à déposer" style="width: 80%;" required>
-                        <div id="errorMessage" class="text-danger" style="display: none; margin-top: 10px;">
-                            *Le montant à déposer doit être supérieur ou égal à 1000.
-                        </div>
+                    <div class="modal-body d-flex">
+                        
+                        <!-- Formulaire de dépôt -->
+                        <form id="depositForm" class="flex-grow-1" method="POST" action="{{ route('deposer') }}">
+                            @csrf
+                            <div class="mb-3 text-center">
+                                <label for="depositAccount" class="form-label">Numéro de compte</label>
+                                <input type="text" class="form-control mx-auto" id="depositAccount" name="account_number" placeholder="Saisir un numéro de compte" style="width: 80%;" required>
+                            </div>
+                            <div class="mb-3 text-center">
+                                <label for="depositAmount" class="form-label">Montant à déposer</label>
+                                <input type="number" class="form-control mx-auto" id="depositAmount" name="amount" placeholder="Montant à déposer" style="width: 80%;" required>
+                                <div id="errorMessage" class="text-danger" style="display: none; margin-top: 10px;">
+                                    *Le montant à déposer doit être supérieur ou égal à 1000.
+                                </div>
 
-                        <div id="balanceErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
-                            *Le montant à déposer ne peut pas dépasser votre solde actuel de {{ number_format($compte->solde, 2) }} FCFA.
-                        </div>
+                                <div id="balanceErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
+                                    *Le montant à déposer ne peut pas dépasser votre solde actuel de {{ number_format($compte->solde, 2) }} FCFA.
+                                </div>
+                            </div>
+                            <div class="text-center" style="color: blue; margin-bottom: 20px;">
+                                Bonus = 1%
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary">Déposer</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="text-center" style="color: blue; margin-bottom: 20px;">
-                        Bonus = 1%
-                    </div>
-                    <div class="d-flex justify-content-center">
-                        <button type="submit" class="btn btn-primary">Déposer</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.getElementById('depositForm').addEventListener('submit', function(event) {
-        const accountNumber = document.getElementById('depositAccount').value.trim();
-        const amount = parseFloat(document.getElementById('depositAmount').value);
-        const errorMessage = document.getElementById('errorMessage');
-        const balanceErrorMessage = document.getElementById('balanceErrorMessage');
-        const currentBalance = {{ $compte ? $compte->solde : 0 }}; // Récupérez le solde actuel
-
-        // Réinitialiser les messages d'erreur
-        errorMessage.style.display = 'none';
-        balanceErrorMessage.style.display = 'none';
-
-        // Vérifier si le montant est inférieur à 1000
-        if (amount < 1000) {
-            event.preventDefault(); // Empêche la soumission du formulaire
-            errorMessage.style.display = 'block'; // Affiche le message d'erreur
-        } 
-        // Vérifier si le montant dépasse le solde actuel
-        else if (amount > currentBalance) {
-            event.preventDefault(); // Empêche la soumission du formulaire
-            balanceErrorMessage.style.display = 'block'; // Affiche le message d'erreur
-        }
-    });
-
-    // Masquer le message d'erreur lorsque l'utilisateur saisit un nouvel input
-    document.getElementById('depositAccount').addEventListener('input', function() {
-        document.getElementById('errorMessage').style.display = 'none';
-        document.getElementById('balanceErrorMessage').style.display = 'none';
-    });
-
-    document.getElementById('depositAmount').addEventListener('input', function() {
-        const amount = parseFloat(this.value);
-        const errorMessage = document.getElementById('errorMessage');
-        const balanceErrorMessage = document.getElementById('balanceErrorMessage');
-
-        // Masquer le message si le montant est valide
-        if (amount >= 1000) {
-            errorMessage.style.display = 'none';
-        } else {
-            errorMessage.style.display = 'block'; // Montant invalide
-        }
-
-        // Vérifier si le montant dépasse le solde actuel
-        const currentBalance = {{ $compte ? $compte->solde : 0 }};
-        if (amount <= currentBalance) {
-            balanceErrorMessage.style.display = 'none';
-        } else {
-            balanceErrorMessage.style.display = 'block'; // Montant invalide
-        }
-    });
-    </script>
-    
-            <!-- Modal pour le retrait -->
-<div class="modal fade" id="withdrawalModal" tabindex="-1" aria-labelledby="withdrawalModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header text-center">
-                <h5 class="modal-title w-100" id="withdrawalModalLabel">Menu de retrait</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body d-flex">
-                <!-- Formulaire de retrait -->
-                <form id="withdrawalForm" class="flex-grow-1" method="POST" action="{{ route('retirer') }}">
-                    @csrf
-                    <div class="mb-3 text-center">
-                        <label for="withdrawalAccount" class="form-label">Numéro de compte</label>
-                        <input type="text" class="form-control mx-auto" id="withdrawalAccount" name="account_number" placeholder="Saisir un numéro de compte" style="width: 80%;" required>
-                    </div>
-                    <div class="mb-3 text-center">
-                        <label for="withdrawalAmount" class="form-label">Montant à retirer</label>
-                        <input type="number" class="form-control mx-auto" id="withdrawalAmount" name="amount" placeholder="Montant à retirer" style="width: 80%;" required>
-                        <div id="withdrawalErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
-                            *Le montant à retirer doit être supérieur ou égal à 1000.
-                        </div>
-                        <div id="withdrawalBalanceErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
-                            *Le montant à retirer ne peut pas dépasser votre solde actuel.
-                        </div>
-                    </div>
-
-                    <div class="text-center" style="color: blue; margin-bottom: 20px;">
-                        Bonus = 1%
-                    </div>
-                    
-                    <div class="d-flex justify-content-center">
-                        <button type="submit" class="btn btn-primary">Retirer</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
+
+        <script>
+            document.getElementById('depositForm').addEventListener('submit', function(event) {
+                const accountNumber = document.getElementById('depositAccount').value.trim();
+                const amount = parseFloat(document.getElementById('depositAmount').value);
+                const errorMessage = document.getElementById('errorMessage');
+                const balanceErrorMessage = document.getElementById('balanceErrorMessage');
+                const currentBalance = {{ $compte ? $compte->solde : 0 }}; // Récupérez le solde actuel
+
+                // Réinitialiser les messages d'erreur
+                errorMessage.style.display = 'none';
+                balanceErrorMessage.style.display = 'none';
+
+                // Vérifier si le montant est inférieur à 1000
+                if (amount < 1000) {
+                    event.preventDefault(); // Empêche la soumission du formulaire
+                    errorMessage.style.display = 'block'; // Affiche le message d'erreur
+                } 
+                // Vérifier si le montant dépasse le solde actuel
+                else if (amount > currentBalance) {
+                    event.preventDefault(); // Empêche la soumission du formulaire
+                    balanceErrorMessage.style.display = 'block'; // Affiche le message d'erreur
+                }
+            });
+
+            // Masquer le message d'erreur lorsque l'utilisateur saisit un nouvel input
+            document.getElementById('depositAccount').addEventListener('input', function() {
+                document.getElementById('errorMessage').style.display = 'none';
+                document.getElementById('balanceErrorMessage').style.display = 'none';
+            });
+
+            document.getElementById('depositAmount').addEventListener('input', function() {
+                const amount = parseFloat(this.value);
+                const errorMessage = document.getElementById('errorMessage');
+                const balanceErrorMessage = document.getElementById('balanceErrorMessage');
+
+                // Masquer le message si le montant est valide
+                if (amount >= 1000) {
+                    errorMessage.style.display = 'none';
+                } else {
+                    errorMessage.style.display = 'block'; // Montant invalide
+                }
+
+                // Vérifier si le montant dépasse le solde actuel
+                const currentBalance = {{ $compte ? $compte->solde : 0 }};
+                if (amount <= currentBalance) {
+                    balanceErrorMessage.style.display = 'none';
+                } else {
+                    balanceErrorMessage.style.display = 'block'; // Montant invalide
+                }
+            });
+            </script>
+            
+        <!-- Modal pour le retrait -->
+        <div class="modal fade" id="withdrawalModal" tabindex="-1" aria-labelledby="withdrawalModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header text-center">
+                        <h5 class="modal-title w-100" id="withdrawalModalLabel">Menu de retrait</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex">
+                        <!-- Formulaire de retrait -->
+                        <form id="withdrawalForm" class="flex-grow-1" method="POST" action="{{ route('retirer') }}">
+                            @csrf
+                            <div class="mb-3 text-center">
+                                <label for="withdrawalAccount" class="form-label">Numéro de compte</label>
+                                <input type="text" class="form-control mx-auto" id="withdrawalAccount" name="account_number" placeholder="Saisir un numéro de compte" style="width: 80%;" required>
+                            </div>
+                            <div class="mb-3 text-center">
+                                <label for="withdrawalAmount" class="form-label">Montant à retirer</label>
+                                <input type="number" class="form-control mx-auto" id="withdrawalAmount" name="amount" placeholder="Montant à retirer" style="width: 80%;" required>
+                                <div id="withdrawalErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
+                                    *Le montant à retirer doit être supérieur ou égal à 1000.
+                                </div>
+                                <div id="withdrawalBalanceErrorMessage" class="text-danger" style="display: none; margin-top: 10px;">
+                                    *Le montant à retirer ne peut pas dépasser votre solde actuel.
+                                </div>
+                            </div>
+
+                            <div class="text-center" style="color: blue; margin-bottom: 20px;">
+                                Bonus = 1%
+                            </div>
+                            
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary">Retirer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.getElementById('withdrawalAccount').addEventListener('input', function() {
+                const accountNumber = this.value;
+
+                if (accountNumber.length >= 5) { // Vérifiez si le numéro de compte est valide
+                    fetch(`/api/get-account-info/${accountNumber}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.success) {
+                                alert(data.message); // Affichez le message d'erreur
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur lors de la récupération des informations :', error);
+                        });
+                }
+            });
+
+            document.getElementById('withdrawalForm').addEventListener('submit', function(event) {
+                const amount = parseFloat(document.getElementById('withdrawalAmount').value);
+                const withdrawalErrorMessage = document.getElementById('withdrawalErrorMessage');
+                const withdrawalBalanceErrorMessage = document.getElementById('withdrawalBalanceErrorMessage');
+
+                // Réinitialiser les messages d'erreur
+                withdrawalErrorMessage.style.display = 'none';
+                withdrawalBalanceErrorMessage.style.display = 'none';
+
+                // Debugging: afficher les valeurs
+                console.log('Montant à retirer:', amount);
+
+                // Vérifier si le montant est inférieur à 1000
+                if (amount < 1000) {
+                    event.preventDefault(); // Empêche la soumission du formulaire
+                    withdrawalErrorMessage.style.display = 'block'; // Affiche le message d'erreur
+                } 
+                // Vérifier si le montant dépasse le solde du client (si nécessaire, vous pouvez gérer cela ici)
+                // Vous aurez besoin d'ajouter une logique pour obtenir le solde ici si vous le souhaitez
+            });
+
+            // Masquer les messages d'erreur lors de la saisie
+            document.getElementById('withdrawalAmount').addEventListener('input', function() {
+                const amount = parseFloat(this.value);
+                const withdrawalErrorMessage = document.getElementById('withdrawalErrorMessage');
+                const withdrawalBalanceErrorMessage = document.getElementById('withdrawalBalanceErrorMessage');
+
+                // Vérifier si le montant est valide
+                withdrawalErrorMessage.style.display = (amount >= 1000) ? 'none' : 'block';
+                // Vous pouvez également gérer la vérification du solde ici si nécessaire
+            });
+        </script>
+
+        <!-- Modal d'Annulation -->
+        <div class="modal fade" id="annulationModal" tabindex="-1" aria-labelledby="annulationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="annulationModalLabel">Annulation de la Transaction</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                    <form id="annulationForm" method="POST" action="{{ route('annuler.transaction') }}" >
+                        @csrf
+                        <div class="mb-3">
+                            <label for="numeroCompte" class="form-label">Numéro de Compte</label>
+                            <input type="text" class="form-control" name="numero_compte" id="numeroCompte" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="transactionId" class="form-label">ID de Transaction</label>
+                            <input type="text" class="form-control" name="transaction_id" id="transactionId" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Annuler la Transaction</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Gérer l'affichage des données dans le modal d'annulation
+            $('#annulationModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget); // Bouton qui a déclenché le modal
+                var transactionId = button.data('transaction-id'); // Récupérer l'ID de la transaction
+
+                // Mettre à jour le champ de l'ID de la transaction
+                var modal = $(this);
+                modal.find('#transactionId').val(transactionId);
+            });
+        </script>
+</div>
 </div>
 
-<script>
-    document.getElementById('withdrawalAccount').addEventListener('input', function() {
-        const accountNumber = this.value;
-
-        if (accountNumber.length >= 5) { // Vérifiez si le numéro de compte est valide
-            fetch(`/api/get-account-info/${accountNumber}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.success) {
-                        alert(data.message); // Affichez le message d'erreur
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur lors de la récupération des informations :', error);
-                });
-        }
-    });
-
-    document.getElementById('withdrawalForm').addEventListener('submit', function(event) {
-        const amount = parseFloat(document.getElementById('withdrawalAmount').value);
-        const withdrawalErrorMessage = document.getElementById('withdrawalErrorMessage');
-        const withdrawalBalanceErrorMessage = document.getElementById('withdrawalBalanceErrorMessage');
-
-        // Réinitialiser les messages d'erreur
-        withdrawalErrorMessage.style.display = 'none';
-        withdrawalBalanceErrorMessage.style.display = 'none';
-
-        // Debugging: afficher les valeurs
-        console.log('Montant à retirer:', amount);
-
-        // Vérifier si le montant est inférieur à 1000
-        if (amount < 1000) {
-            event.preventDefault(); // Empêche la soumission du formulaire
-            withdrawalErrorMessage.style.display = 'block'; // Affiche le message d'erreur
-        } 
-        // Vérifier si le montant dépasse le solde du client (si nécessaire, vous pouvez gérer cela ici)
-        // Vous aurez besoin d'ajouter une logique pour obtenir le solde ici si vous le souhaitez
-    });
-
-    // Masquer les messages d'erreur lors de la saisie
-    document.getElementById('withdrawalAmount').addEventListener('input', function() {
-        const amount = parseFloat(this.value);
-        const withdrawalErrorMessage = document.getElementById('withdrawalErrorMessage');
-        const withdrawalBalanceErrorMessage = document.getElementById('withdrawalBalanceErrorMessage');
-
-        // Vérifier si le montant est valide
-        withdrawalErrorMessage.style.display = (amount >= 1000) ? 'none' : 'block';
-        // Vous pouvez également gérer la vérification du solde ici si nécessaire
-    });
-</script>
-    </div>
-</div>
     <!-- Titre des transactions -->
     <h3 style="margin-left: 300px; margin-top: -440px;">Liste des Transactions</h3>
 
@@ -353,6 +386,7 @@
                 <th>Date</th>
                 <th>Montant</th>
                 <th>Facture</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -370,18 +404,23 @@
                         {{ $transaction->type == 'depot' ? '-' : '+' }}{{ number_format(abs($transaction->mountant), 2) }} FCFA
                     </td>         
 
-                    <td>
-                    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#factureModal" 
-                            data-id="{{ $transaction->id }}"
-                            data-nom="{{ $transaction->receveur->nom }}"
-                            data-prenom="{{ $transaction->receveur->prenom }}"
-                            data-telephone="{{ $transaction->receveur->telephone }}"
-                            data-date="{{ $transaction->created_at->format('Y-m-d') }}"
-                            data-montant="{{ number_format($transaction->mountant, 2) }} FCFA"
-                            data-type="{{ $transaction->type }}">
-                        Voir Facture
-                    </button>
+                   <td>
+                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#factureModal" 
+                                data-id="{{ $transaction->id }}"
+                                data-nom="{{ $transaction->receveur->nom }}"
+                                data-prenom="{{ $transaction->receveur->prenom }}"
+                                data-telephone="{{ $transaction->receveur->telephone }}"
+                                data-date="{{ $transaction->created_at->format('Y-m-d') }}"
+                                data-montant="{{ number_format($transaction->mountant, 2) }} FCFA"
+                                data-type="{{ $transaction->type }}">
+                            Voir Facture
+                        </button>  
                     </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#annulationModal" 
+                            data-transaction-id="{{ $transaction->id }}">
+                            Annulation
+                        </button></td>
                 </tr>
             @endforeach
         </tbody>

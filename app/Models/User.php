@@ -5,10 +5,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable; // Assurez-vous d'importer le trait ici
+
 
 class User extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable; // Ajout du trait Notifiable
 
     protected $fillable = [
         'prenom',
@@ -46,6 +48,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(Compte::class);
     }
+
+    
 
 }
 

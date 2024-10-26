@@ -17,7 +17,7 @@ return new class extends Migration
         $table->unsignedBigInteger('receveur_id')->nullable(); // Client pour un transfert
         $table->unsignedBigInteger('distributeur_id'); // Distributeur pour dépôt ou retrait
         $table->unsignedBigInteger('agent_id')->nullable(); // Agent pour dépôt illimité ou annulation
-        $table->enum('type', ['depot', 'retrait', 'transfert']);
+        $table->enum('type', ['depot', 'retrait', 'transfert', 'annulation']);
         $table->decimal('mountant', 15, 2);
         $table->decimal('frais', 15, 2)->default(0); // Frais de 2% pour transfert
         $table->boolean('annule')->default(false); // Annulé ou non
