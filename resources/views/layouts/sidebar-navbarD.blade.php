@@ -14,7 +14,7 @@
 
  
 </head>
-<body>
+<body style="background-color: #E5E5E5;">
 
     <!-- Sidebar -->
     <div class="d-flex" style="height: 100vh;">
@@ -55,9 +55,12 @@
 
                 <!-- Déconnexion button (aligned at the bottom) -->
                 <div class="mt-auto mb-3 px-3">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf <!-- Protection contre les attaques CSRF -->
                     <button class="btn btn-secondary w-100" style="background-color: #505887; color: white;">
                         <i class="bi bi-box-arrow-left"></i> Déconnexion
                     </button>
+                    </form>
                 </div>
             </div>
         </nav>
