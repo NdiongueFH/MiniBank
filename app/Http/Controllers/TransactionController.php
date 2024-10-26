@@ -118,12 +118,13 @@ class TransactionController extends Controller
         // Récupérer le compte associé
         $compte = Compte::where('user_id', $distributeur->id)->first();
 
-        // Récupérer les transactions avec les receveurs
+         // Récupérer uniquement les transactions pour ce distributeur
         $transactions = Transaction::with('receveur')
+        ->where('distributeur_id', $distributeur->id) // Filtrer par distributeur connecté
         ->orderBy('created_at', 'desc') // Tri par date décroissante
         ->get();
-        
 
+       
         // Passer les transactions, l'utilisateur et le compte à la vue
         return view('distributeur_transactions', [
             'transactions' => $transactions,
