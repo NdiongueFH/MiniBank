@@ -9,7 +9,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class DashboardController extends Controller
 {
-   public function clientDashboard()
+    public function clientDashboard()
 {
     $client = Auth::user();
     $compte = Compte::where('user_id', $client->id)->first();
@@ -29,8 +29,8 @@ class DashboardController extends Controller
         ->get();
 
     // Plafonds fixes pour le compte client
-    $cumulMensuelMaximum = 5000000; // Par exemple, un plafond mensuel de 5 000 000 FCFA
-    $soldeMaximum = 1000000; // Plafond fixe de 1 000 000 FCFA
+    $cumulMensuelMaximum = 5000000; // Exemple de plafond mensuel
+    $soldeMaximum = 1000000; // Plafond fixe
 
     // Calculer le cumul mensuel des transactions
     $cumulMontantsRecus = Transaction::where('receveur_id', $client->id)
@@ -41,8 +41,8 @@ class DashboardController extends Controller
     // Obtenir le solde du client
     $solde = $compte->solde;
 
-    // Générer le QR code pour le numéro de compte avec un timestamp
-    $qrCodeImage = QrCode::format('png')->size(200)->generate($client->num_compte . '?' . time());
+    // Générer le QR code pour le numéro de compte
+    $qrCodeImage = QrCode::format('png')->size(200)->generate($client->num_compte);
 
     // Transactions pour le graphique
     $transactions = Transaction::where('emetteur_id', $client->id)
@@ -68,15 +68,22 @@ class DashboardController extends Controller
         'client' => $client,
         'recentTransactions' => $recentTransactions,
         'solde' => $solde,
-        'qrCode' => $qrCodeImage,
+        'qrCode' => base64_encode($qrCodeImage),
         'plafondsCompte' => [
             'solde_maximum' => $soldeMaximum,
             'cumul_mensuel_maximum' => $cumulMensuelMaximum,
             'cumul_maximum_restant' => max(0, $cumulMaximumRestant),
         ],
-        'numCompte' => $client->num_compte, // Ajout du numéro de compte
-        'dashboardData' => $dashboardData,
+        'numCompte' => $client->num_compte,
+        'dashboardData' => $dashboardData, // Assurez-vous que cela est inclus
     ]);
+}
+
+    public function generateQrCode()
+{
+    $client = Auth::user();
+    $qrCodeImage = QrCode::format('png')->size(200)->generate($client->num_compte . '?' . time());
+    return response()->json(['qrCode' => base64_encode($qrCodeImage)]);
 }
 
 

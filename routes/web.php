@@ -43,7 +43,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/distributeur', [DashboardController::class, 'distributeurDashboard'])->name('dashboard.distributeur');
 });
 
-
+Route::get('/generate-qr-code', [UserController::class, 'generateQrCode'])->middleware('auth');
 
 
 Route::get('/dashboard', function () {
