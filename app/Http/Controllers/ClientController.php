@@ -26,17 +26,17 @@ class ClientController extends Controller
         $compte = Compte::where('user_id', $client->id)->first();
     
         // Contenu du QR code avec des informations structurées
-        $clientInfo = "Nom: {$client->nom}\n" .
-                      "Prénom: {$client->prenom}\n" .
-                      "Téléphone: {$client->telephone}\n" .
-                      "Numéro de compte: {$client->num_compte}\n" .
-                      "Statut: " . ($client->blocked ? 'Bloqué' : 'Actif');
+        // $clientInfo = "Nom: {$client->nom}\n" .
+        //               "Prénom: {$client->prenom}\n" .
+        //               "Téléphone: {$client->telephone}\n" .
+        //               "Numéro de compte: {$client->num_compte}\n" .
+        //               "Statut: " . ($client->blocked ? 'Bloqué' : 'Actif');
     
         // Générer le QR code avec un format plus grand
-        $qrCodePath = 'qrcodes/client_qrcode.png';
-        QrCode::format('png')
-            ->size(300) // Taille plus grande pour plus de clarté
-            ->generate($clientInfo, storage_path("app/public/{$qrCodePath}"));
+        // $qrCodePath = 'qrcodes/client_qrcode.png';
+        // QrCode::format('png')
+        //     ->size(300) // Taille plus grande pour plus de clarté
+        //     ->generate($clientInfo, storage_path("app/public/{$qrCodePath}"));
     
         // Récupérer les transactions du client
         $transactions = Transaction::where(function($query) use ($client) {

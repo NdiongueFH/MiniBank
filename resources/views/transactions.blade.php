@@ -130,9 +130,9 @@
                 </div>
 
                 <!-- QR Code à droite -->
-                <div class="p-3">
+                <!-- <div class="p-3">
                     <img src="{{ asset('storage/' . $qrCodePath) }}" alt="QR Code du Client" style="width: 200px; height: 150px;">
-                </div>
+                </div> -->
             </div>
 
             <!-- Ligne de séparation -->
