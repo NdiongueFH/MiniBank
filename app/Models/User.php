@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;  
+ use Illuminate\Database\Eloquent\Relations\HasMany;  
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -20,6 +23,11 @@ class User extends Authenticatable
         'nom',
         'telephone', // Champ utilisé pour l'authentification
         'email',
+        'num_compte',
+        'adresse',
+        'carte_identite',
+        'photo',
+        'date_naissance',
         'num_compte',
         'adresse',
         'carte_identite',

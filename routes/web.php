@@ -13,8 +13,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/side-nav', function () {
-    return view('layouts.sidebar-navbar'); // afficheage sidebar et navbar
+Route::get('/dashboard/data', [UserController::class, 'getDashboardData'])->name('dashboard.data');
+
+
+  
+Route::get('/side-navC', function () {
+    return view('layouts.sidebar-navbarC'); // afficheage sidebar et navbar
 });
 
 Route::get('/users/{id}/compte', [UserController::class, 'getCompte']);
@@ -32,19 +36,19 @@ Route::get('/transaction/{id}', [TransactionController::class, 'show'])->name('t
 Route::get('/distributeur-transactions', [TransactionController::class, 'index'])
     ->name('distributeur.transactions');
 
+Route::get('/generate-qr-code', [UserController::class, 'generateQrCode'])->middleware('auth');
 
-
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
     
 
-    Route::middleware('auth')->group(function () {
-        Route::get('/client/transactions', [ClientController::class, 'index'])->name('client.transactions');
+Route::middleware('auth')->group(function () {
+Route::get('/client/transactions', [ClientController::class, 'index'])->name('client.transactions');
     });
     
-    Route::get('/api/get-account-info/{accountNumber}', [TransactionController::class, 'getAccountInfo']);
+Route::get('/api/get-account-info/{accountNumber}', [TransactionController::class, 'getAccountInfo']);
     
-    Route::get('/transactions/{client_id}', [TransactionController::class, 'getTransactions']);
+Route::get('/transactions/{client_id}', [TransactionController::class, 'getTransactions']);
     
 
 
