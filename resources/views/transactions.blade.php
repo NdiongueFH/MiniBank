@@ -13,7 +13,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-
+    <!-- @if(session('message'))
+        <div class="alert alert-{{ session('message_type') == 'success' ? 'success' : 'danger' }}">
+            {{ session('message') }}
+        </div>
+    @endif -->
+    
     <!-- Sidebar -->
     <div class="d-flex" style="height: 100vh;">
         <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="position: fixed; height: 100vh; width: 240px;">
@@ -115,27 +120,48 @@
 
             <h2 class="titre" style="margin-left: 50px; margin-top: 20px;">Ma carte</h2>
 
-           <!-- Bloc de la taille d'une carte bancaire -->
-            <div class="carte" style="width: 800px; height: 280px; background-color: #f8f9fa; border: 1px solid #ced4da; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-left: 50px; margin-top: 20px;">
-                <!-- Contenu du bloc (comme un numéro de carte, nom, etc.) -->
-                <div class="p-3">
-                    <p>Solde</p>
-                    <h5>{{ $compte ? number_format($compte->solde, 2) : '0.00' }} FCFA</h5><br>
-                    <p>Nom d'utilisateur</p>
-                    <h5>{{ $client->prenom }} {{ $client->nom }}</h5>
-                </div>
+          <!-- Bloc de la taille d'une carte bancaire -->
+<div class="carte" style="width: 800px; height: 280px; background-color: #f8f9fa; border: 1px solid #ced4da; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-left: 50px; margin-top: 20px;">
+    <!-- Contenu du bloc (comme un numéro de carte, nom, etc.) -->
+    <div class="p-3">
+        <p>Solde</p>
+        <h5>{{ $compte ? number_format($compte->solde, 0) : '0' }} FCFA</h5><br>
+        <p>Nom d'utilisateur</p>
+        <h5>{{ $client->prenom }} {{ $client->nom }}</h5>
+    </div>
 
-                <!-- Trait fin -->
-                <hr style="border: 1px solid #ced4da; margin: 0;">
+    <!-- Trait fin -->
+    <hr style="border: 1px solid #ced4da; margin: 0;">
 
-                <!-- Numéro de téléphone -->
-                <div class="p-3 d-flex justify-content-between align-items-center">
-                    <h5>{{ $client->telephone }}</h5>
-                    <img src="{{ asset('images/num.png') }}" alt="Icône Téléphone" style="width: 70px; height: 50px; margin-left: 10px;">
-                </div>
+    <!-- Numéro de téléphone -->
+    <div class="p-3 d-flex justify-content-between align-items-center">
+        <h5>{{ $client->telephone }}</h5>
+        <img src="{{ asset('images/num.png') }}" alt="Icône Téléphone" style="width: 70px; height: 50px; margin-left: 10px;">
+    </div>
 
+    <!-- Message d'alerte -->
+    @if(session('message'))
+        <div style="margin-top: 10px; color: {{ session('message_type') == 'success' ? 'green' : 'red' }};">
+            {{ session('message') }}
+        </div>
 
-            </div>
+        <script>
+            // Fonction pour masquer le message après 5 secondes
+            setTimeout(function() {
+                var messageDiv = document.querySelector('div[style*="margin-top: 10px"]'); // Sélectionne le message
+                if (messageDiv) {
+                    messageDiv.style.transition = 'opacity 0.5s ease'; // Ajoute une transition
+                    messageDiv.style.opacity = '0'; // Change l'opacité à 0
+                    setTimeout(function() {
+                        messageDiv.style.display = 'none'; // Cache l'élément après la transition
+                    }, 500); // Temps de la transition
+                }
+            }, 5000); // 5000 millisecondes = 5 secondes
+        </script>
+    @endif
+
+</div>
+
 
       <!-- Bloc de transfert -->
 <div class="transfer-button" style="width: 300px; height: 120px; background-color: #2D60FF; color: white; border-radius: 40px; display: flex; align-items: center; justify-content: center; margin-left: 1000px; margin-top: -200px;" onclick="openModal()">
@@ -151,7 +177,8 @@
         <img src="{{ asset('images/Minibank.png') }}" alt="Logo" style="display: block; width: 300px; margin: 0 auto 20px auto;">
         
         <h2 style="text-align: center;">Transférer de l'argent</h2>
-        <form id="transferForm">
+        <form id="transferForm" action="{{ route('transferer') }}" method="POST">
+        @csrf <!-- Ajoutez le jeton CSRF pour protéger contre les attaques CSRF -->
             <label for="numero_compte">Numéro de compte:</label>
             <input type="text" id="numero_compte" name="numero_compte" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
             
@@ -308,94 +335,106 @@ document.getElementById('montant_recu').addEventListener('input', function() {
 
     <div class="transactions" style="width: 1500px; height: 350px; background-color: #f8f9fa; border: 1px solid #ced4da; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-left: 300px; margin-top: 5px; padding: 20px; overflow-y: auto;">
     <table class="table table-bordered" style="min-width: 100%;">
-        <thead>
+    <thead>
+        <tr>
+            <th>Nom Émetteur</th>
+            <th>Prénom Émetteur</th>
+            <th>Nom Receveur</th>
+            <th>Prénom Receveur</th>
+            <th>ID Transaction</th>
+            <th>Téléphone Receveur</th>
+            <th>Date</th>
+            <th>Montant</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($transactions as $transaction)
             <tr>
-                <th>Nom Distributeur</th>
-                <th>Prénom Distributeur</th>
-                <th>ID Transaction</th>
-                <th>Téléphone Distributeur</th>
-                <th>Date</th>
-                <th>Montant</th>
-                <th>Action</th>
+                <td>{{ $transaction->emetteur->nom }}</td>
+                <td>{{ $transaction->emetteur->prenom }}</td>
+                <td>{{ $transaction->receveur->nom }}</td>
+                <td>{{ $transaction->receveur->prenom }}</td>
+                <td>{{ $transaction->id }}</td>
+                <td>{{ $transaction->receveur->telephone }}</td>
+                <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
+               <td style="color: {{ $transaction->type == 'depot' ? 'green' : ($transaction->type == 'transfert' ? 'orange' : 'red') }};">
+                    {{ $transaction->type == 'depot' ? '+' : ($transaction->type == 'transfert' ? '' : '-') }}{{ number_format($transaction->mountant, 2) }} FCFA
+                </td>                          
+                <td>
+                    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#factureModalClient"
+                            data-id="{{ $transaction->id }}"
+                            data-nom-emetteur="{{ $transaction->emetteur->nom }}"
+                            data-prenom-emetteur="{{ $transaction->emetteur->prenom }}"
+                            data-nom-receveur="{{ $transaction->receveur->nom }}"
+                            data-prenom-receveur="{{ $transaction->receveur->prenom }}"
+                            data-telephone-receveur="{{ $transaction->receveur->telephone }}"
+                            data-date="{{ $transaction->created_at->format('Y-m-d') }}"
+                            data-montant="{{ number_format($transaction->mountant, 2) }} FCFA"
+                            data-type="{{ $transaction->type }}">
+                        Voir Facture
+                    </button>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach($transactions as $transaction)
-                <tr>
-                    <td>{{ $transaction->distributeur->nom }}</td>
-                    <td>{{ $transaction->distributeur->prenom }}</td>
-                    <td>{{ $transaction->id }}</td>
-                    <td>{{ $transaction->distributeur->telephone }}</td>
-                    <td>{{ $transaction->created_at->format('Y-m-d') }}</td>
-                    <td style="color: {{ $transaction->type == 'depot' ? 'green' : 'red' }};">
-                        {{ $transaction->type == 'depot' ? '+' : '-' }}{{ number_format($transaction->mountant, 2) }} FCFA
-                    </td>                          
-                    <td>
-                        <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#factureModalClient"
-                                data-id="{{ $transaction->id }}"
-                                data-nom-distributeur="{{ $transaction->distributeur->nom }}"
-                                data-prenom-distributeur="{{ $transaction->distributeur->prenom }}"
-                                data-telephone-distributeur="{{ $transaction->distributeur->telephone }}"
-                                data-date="{{ $transaction->created_at->format('Y-m-d') }}"
-                                data-montant="{{ number_format($transaction->mountant, 2) }} FCFA"
-                                data-type="{{ $transaction->type }}">
-                            Voir Facture
-                        </button>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+        @endforeach
+    </tbody>
+</table>
+
 </div>
-        <!-- Modal Facture Client -->
-        <div class="modal fade" id="factureModalClient" tabindex="-1" aria-labelledby="factureModalClientLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="factureModalClientLabel">Détails de la Facture</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <strong>ID Transaction :</strong> <span id="modalTransactionIdClient"></span><br>
-                        <strong>Nom Distributeur :</strong> <span id="modalNomDistributeur"></span><br>
-                        <strong>Prénom Distributeur :</strong> <span id="modalPrenomDistributeur"></span><br>
-                        <strong>Téléphone :</strong> <span id="modalTelephoneDistributeur"></span><br>
-                        <strong>Date :</strong> <span id="modalDateClient"></span><br>
-                        <strong>Montant :</strong> <span id="modalMontantClient"></span><br>
-                        <strong>Type :</strong> <span id="modalTypeClient"></span><br>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    </div>
-                </div>
+       <!-- Modal Facture Client -->
+<div class="modal fade" id="factureModalClient" tabindex="-1" aria-labelledby="factureModalClientLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="factureModalClientLabel">Détails de la Facture</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <strong>ID Transaction :</strong> <span id="modalTransactionIdClient"></span><br>
+                <strong>Nom Émetteur :</strong> <span id="modalNomEmetteur"></span><br>
+                <strong>Prénom Émetteur :</strong> <span id="modalPrenomEmetteur"></span><br>
+                <strong>Nom Receveur :</strong> <span id="modalNomReceveur"></span><br>
+                <strong>Prénom Receveur :</strong> <span id="modalPrenomReceveur"></span><br>
+                <strong>Téléphone Receveur :</strong> <span id="modalTelephoneReceveur"></span><br>
+                <strong>Date :</strong> <span id="modalDateClient"></span><br>
+                <strong>Montant :</strong> <span id="modalMontantClient"></span><br>
+                <strong>Type :</strong> <span id="modalTypeClient"></span><br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
         </div>
+    </div>
+</div>
 
-        <script>
-            // Événement au clic sur le bouton "Voir Facture" pour le client
-            document.querySelectorAll('button[data-bs-target="#factureModalClient"]').forEach(button => {
-                button.addEventListener('click', function() {
-                    // Récupérer les données des attributs data-*
-                    const transactionId = this.getAttribute('data-id');
-                    const nomDistributeur = this.getAttribute('data-nom-distributeur');
-                    const prenomDistributeur = this.getAttribute('data-prenom-distributeur');
-                    const telephoneDistributeur = this.getAttribute('data-telephone-distributeur');
-                    const date = this.getAttribute('data-date');
-                    const mountant = this.getAttribute('data-montant');
-                    const type = this.getAttribute('data-type');
+<script>
+    // Événement au clic sur le bouton "Voir Facture" pour le client
+    document.querySelectorAll('button[data-bs-target="#factureModalClient"]').forEach(button => {
+        button.addEventListener('click', function() {
+            // Récupérer les données des attributs data-*
+            const transactionId = this.getAttribute('data-id');
+            const nomEmetteur = this.getAttribute('data-nom-emetteur');
+            const prenomEmetteur = this.getAttribute('data-prenom-emetteur');
+            const nomReceveur = this.getAttribute('data-nom-receveur');
+            const prenomReceveur = this.getAttribute('data-prenom-receveur');
+            const telephoneReceveur = this.getAttribute('data-telephone-receveur');
+            const date = this.getAttribute('data-date');
+            const montant = this.getAttribute('data-montant');
+            const type = this.getAttribute('data-type');
 
-                    // Remplir le modal avec les données
-                    document.getElementById('modalTransactionIdClient').textContent = transactionId;
-                    document.getElementById('modalNomDistributeur').textContent = nomDistributeur;
-                    document.getElementById('modalPrenomDistributeur').textContent = prenomDistributeur;
-                    document.getElementById('modalTelephoneDistributeur').textContent = telephoneDistributeur;
-                    document.getElementById('modalDateClient').textContent = date;
-                    document.getElementById('modalMontantClient').textContent = mountant;
-                    document.getElementById('modalTypeClient').textContent = type;
-                });
-            });
-        </script>
-
+            // Remplir le modal avec les données
+            document.getElementById('modalTransactionIdClient').textContent = transactionId;
+            document.getElementById('modalNomEmetteur').textContent = nomEmetteur;
+            document.getElementById('modalPrenomEmetteur').textContent = prenomEmetteur;
+            document.getElementById('modalNomReceveur').textContent = nomReceveur;
+            document.getElementById('modalPrenomReceveur').textContent = prenomReceveur;
+            document.getElementById('modalTelephoneReceveur').textContent = telephoneReceveur;
+            document.getElementById('modalDateClient').textContent = date;
+            document.getElementById('modalMontantClient').textContent = montant;
+            document.getElementById('modalTypeClient').textContent = type;
+        });
+    });
+</script>
 
         <!-- Pagination -->
         <div class="pagination" style="margin-top: 20px; display: flex; justify-content: flex-end; margin-right: 50px;">
@@ -413,7 +452,7 @@ document.getElementById('montant_recu').addEventListener('input', function() {
         </a>
 </div>
 
-
+   
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

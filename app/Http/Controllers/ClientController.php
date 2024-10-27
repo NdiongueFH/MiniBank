@@ -54,52 +54,67 @@ class ClientController extends Controller
     }
 
     public function transfer(Request $request)
-    {
-        // Validation des données
-        $request->validate([
-            'numero_compte' => 'required|string',
-            'montant_envoye' => 'required|numeric|min:500', // Vérification que le montant est supérieur à 500
-        ]);
+{
+    // Validation des données
+    $request->validate([
+        'numero_compte' => 'required|string', // Numéro de compte du récepteur
+        'montant_envoye' => 'required|numeric|min:500', // Vérification que le montant est supérieur à 500
+    ]);
 
-        // Trouver le compte émetteur
-        $emetteur = Compte::where('user_id', auth()->user()->id)->first();
+    // Trouver le compte émetteur (l'utilisateur connecté)
+    $emetteur = Compte::where('user_id', auth()->user()->id)->first();
 
-        // Vérifier si le compte existe
-        if (!$emetteur) {
-            return response()->json(['error' => 'Votre compte n\'existe pas.'], 404);
+    // Vérifier si le compte existe
+    if (!$emetteur) {
+        session(['message' => 'Votre compte n\'existe pas.', 'message_type' => 'error']);
+        return redirect()->back();    }
+
+    // Vérifier le solde du compte émetteur
+    if ($emetteur->solde < $request->montant_envoye) {
+        session(['message' => 'Votre solde est insuffisant pour effectuer ce transfert.', 'message_type' => 'error']);
+        return redirect()->back();
         }
 
-        // Vérifier le solde du compte émetteur
-        if ($emetteur->solde < $request->montant_envoye) {
-            return response()->json(['error' => 'Votre solde est insuffisant pour effectuer ce transfert.'], 403);
+    // Trouver le compte récepteur en fonction du numéro de compte entré dans le formulaire
+    $receveur = Compte::whereHas('user', function($query) use ($request) {
+        $query->where('num_compte', $request->numero_compte);
+    })->first();
+
+    // Vérifier si le compte récepteur existe
+    if (!$receveur) {
+        session(['message' => 'Le compte récepteur n\'existe pas.', 'message_type' => 'error']);
+        return redirect()->back();
         }
 
-        // Trouver le compte récepteur
-        $receveur = User::where('num_compte', $request->numero_compte)->first();
+    // Calculer les frais de 2% et le montant reçu par le récepteur
+    $frais = $request->montant_envoye * 0.02;
+    $montant_recu = $request->montant_envoye - $frais;
 
-        // Vérifier si le compte récepteur existe
-        if (!$receveur) {
-            return response()->json(['error' => 'Le compte récepteur n\'existe pas.'], 404);
-        }
+    // Effectuer le transfert
+    // Réduire le solde de l'émetteur
+    $emetteur->solde -= $request->montant_envoye;
+    $emetteur->save();
 
-        // Effectuer le transfert
-        // Réduire le solde de l'émetteur
-        $emetteur->solde -= $request->montant_envoye;
-        $emetteur->save();
+    // Augmenter le solde du récepteur
+    $receveur->solde += $montant_recu;
+    $receveur->save();
 
-        // Créer la transaction pour le transfert
-        Transaction::create([
-            'emettteur_id' => auth()->user()->id,
-            'receveur_id' => $receveur->id,
-            'distributeur_id' => null, // Mettre à jour si nécessaire
-            'agent_id' => null, // Mettre à jour si nécessaire
-            'type' => 'transfert',
-            'montant' => $request->montant_envoye,
-            'frais' => 0, // Ajustez si vous avez des frais
-            'statut' => 'completed',
-        ]);
+    
 
-        // (Ajouter la logique pour le compte récepteur ici si nécessaire)
-        return response()->json(['success' => 'Transfert effectué avec succès.'], 200);
-    }
+    // Créer la transaction pour le transfert
+    Transaction::create([
+        'emettteur_id' => auth()->user()->id,
+        'receveur_id' => $receveur->user_id,
+        'distributeur_id' => null, // Pas de distributeur dans ce cas
+        'agent_id' => null, // Pas d'agent dans ce cas
+        'type' => 'transfert',
+        'mountant' => $request->montant_envoye,
+        'frais' => $frais,
+        'statut' => 'completed',
+    ]);
+
+    session(['message' => 'Transfert effectué avec succès.', 'message_type' => 'success']);
+    return redirect()->back();
+}
+
 }

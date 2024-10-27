@@ -147,8 +147,7 @@
             
 
            
-        <!-- Modal pour le dépôt -->
-<div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
+        <div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered"> <!-- Taille du modal -->
         <div class="modal-content">
             <div class="modal-header text-center">
@@ -243,7 +242,9 @@
                 }
             });
             </script>
-            
+
+
+              
        <!-- Modal pour le retrait -->
 <div class="modal fade" id="withdrawalModal" tabindex="-1" aria-labelledby="withdrawalModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered"> <!-- Taille du modal -->
@@ -337,8 +338,7 @@
                 // Vous pouvez également gérer la vérification du solde ici si nécessaire
             });
         </script>
-
-        <!-- Modal d'Annulation -->
+<!-- Modal d'Annulation -->
 <div class="modal fade" id="annulationModal" tabindex="-1" aria-labelledby="annulationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered"> <!-- Taille du modal -->
         <div class="modal-content">

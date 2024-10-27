@@ -155,6 +155,8 @@ class TransactionController extends Controller
 
     public function index()
     {
+
+        
         // Récupérer l'utilisateur connecté
         $distributeur = auth()->user();
 
@@ -170,8 +172,7 @@ class TransactionController extends Controller
         $transactions = Transaction::with('receveur')
         ->where('distributeur_id', $distributeur->id) // Filtrer par distributeur connecté
         ->orderBy('created_at', 'desc') // Tri par date décroissante
-        ->get();
-
+        ->paginate(5); // Nombre de transactions par page
        
         // Passer les transactions, l'utilisateur et le compte à la vue
         return view('distributeur_transactions', [
@@ -179,6 +180,8 @@ class TransactionController extends Controller
             'user' => $distributeur,
             'compte' => $compte,
         ]);
+
+        
     }
 
     public function dashboard()
