@@ -339,30 +339,36 @@
         </script>
 
         <!-- Modal d'Annulation -->
-        <div class="modal fade" id="annulationModal" tabindex="-1" aria-labelledby="annulationModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="annulationModalLabel">Annulation de la Transaction</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="annulationModal" tabindex="-1" aria-labelledby="annulationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered"> <!-- Taille du modal -->
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title w-100" id="annulationModalLabel">Annulation de la Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column align-items-center"> <!-- Alignement centré -->
+                <!-- Image ajoutée ici -->
+                <img src="{{ asset('images/Minibank.png') }}" alt="Logo" class="img-fluid mx-auto d-block" width="300" style="margin-bottom: 20px;">
+
+                <form id="annulationForm" method="POST" action="{{ route('annuler.transaction') }}" class="w-100 text-center">
+                    @csrf
+                    <div class="mb-3 d-flex flex-column align-items-center">
+                        <label for="numeroCompte" class="form-label">Numéro de Compte</label>
+                        <input type="text" class="form-control mx-auto" name="numero_compte" id="numeroCompte" style="width: 70%;" required>
                     </div>
-                    <div class="modal-body">
-                    <form id="annulationForm" method="POST" action="{{ route('annuler.transaction') }}" >
-                        @csrf
-                        <div class="mb-3">
-                            <label for="numeroCompte" class="form-label">Numéro de Compte</label>
-                            <input type="text" class="form-control" name="numero_compte" id="numeroCompte" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="transactionId" class="form-label">ID de Transaction</label>
-                            <input type="text" class="form-control" name="transaction_id" id="transactionId" required>
-                        </div>
+                    <div class="mb-3 d-flex flex-column align-items-center">
+                        <label for="transactionId" class="form-label">ID de Transaction</label>
+                        <input type="text" class="form-control mx-auto" name="transaction_id" id="transactionId" style="width: 70%;" required>
+                    </div>
+                    <div class="d-flex justify-content-center">
                         <button type="submit" class="btn btn-danger">Annuler la Transaction</button>
-                    </form>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
+    </div>
+</div>
+
 
         <script>
             // Gérer l'affichage des données dans le modal d'annulation

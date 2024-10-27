@@ -31,5 +31,11 @@ class Client extends Model
     {
         return $this->hasMany(Transaction::class, 'receveur_id');
     }
+
+    // Relation pour les transactions envoyées (émetteur)
+    public function sentTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'emettteur_id');
+    }
     
 }

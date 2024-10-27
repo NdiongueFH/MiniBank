@@ -27,6 +27,9 @@ Route::post('/deposer', [TransactionController::class, 'deposer'])->name('depose
 Route::post('/retirer', [TransactionController::class, 'retirer'])->name('retirer');
 Route::post('/annuler-transaction', [TransactionController::class, 'annulerTransaction'])->name('annuler.transaction');
 
+Route::post('/transferer', [ClientController::class, 'transfer'])->name('transferer');
+
+
 Route::get('/client/search', [ClientController::class, 'search'])->name('client.search');
 
 Route::get('/transaction/{id}', [TransactionController::class, 'show'])->name('transaction.show');

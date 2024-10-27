@@ -143,12 +143,11 @@
     <h5 style="margin: 0;">Transférer</h5>
 </div>
 
-<!-- Modal -->
+<!-- Modal de transfert-->
 <div id="transferModal" class="modal" style="display:none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.5);">
     <div class="modal-content" style="padding: 40px; border-radius: 20px; background-color: white; width: 600px; margin: auto; position: relative; top: 50px;">
         <span class="close" onclick="closeModal()" style="position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 20px;">&times;</span>
         
-        <!-- Image en haut du modal -->
         <img src="{{ asset('images/Minibank.png') }}" alt="Logo" style="display: block; width: 300px; margin: 0 auto 20px auto;">
         
         <h2 style="text-align: center;">Transférer de l'argent</h2>
@@ -157,10 +156,22 @@
             <input type="text" id="numero_compte" name="numero_compte" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
             
             <label for="montant_envoye">Montant envoyé:</label>
-            <input type="number" id="montant_envoye" name="montant_envoye" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
-            
+            <input type="number" id="montant_envoye" name="montant_envoye" required style="width: 100%; padding: 10px; margin: 20px 0 5px 0; border: 1px solid #ccc; border-radius: 5px;">
+            <div id="errorMessage" class="text-danger" style="display: none; margin-top: 5px;">
+                *Le montant envoyé doit être supérieur à 500.
+            </div>
+            <div id="balanceErrorMessage" class="text-danger" style="display: none; margin-top: 5px;">
+                *Votre solde est insuffisant pour effectuer ce transfert.
+            </div>
+
             <label for="montant_recu">Montant reçu:</label>
-            <input type="number" id="montant_recu" name="montant_recu" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+            <input type="number" id="montant_recu" name="montant_recu" required style="width: 100%; padding: 10px; margin: 20px 0 5px 0; border: 1px solid #ccc; border-radius: 5px;">
+            <div id="receivedAmountError" class="text-danger" style="display: none; margin-top: 5px;">
+                *Le montant reçu doit être supérieur à 500.
+            </div>
+            <div id="receivedBalanceErrorMessage" class="text-danger" style="display: none; margin-top: 5px;">
+                *Le montant reçu doit être inférieur au solde disponible.
+            </div>
 
             <button type="submit" style="width: 100%; background-color: #2D60FF; color: white; border: none; border-radius: 5px; padding: 10px;">Confirmer</button>
         </form>
@@ -183,7 +194,112 @@ window.onclick = function(event) {
         closeModal();
     }
 }
+
+document.getElementById('transferForm').addEventListener('submit', function(event) {
+    const amountSent = parseFloat(document.getElementById('montant_envoye').value);
+    const amountReceived = parseFloat(document.getElementById('montant_recu').value);
+    const errorMessage = document.getElementById('errorMessage');
+    const balanceErrorMessage = document.getElementById('balanceErrorMessage');
+    const receivedAmountError = document.getElementById('receivedAmountError');
+    const receivedBalanceErrorMessage = document.getElementById('receivedBalanceErrorMessage');
+    const currentBalance = {{ $compte ? $compte->solde : 0 }}; // Récupérez le solde actuel
+
+    // Réinitialiser les messages d'erreur
+    errorMessage.style.display = 'none';
+    balanceErrorMessage.style.display = 'none';
+    receivedAmountError.style.display = 'none';
+    receivedBalanceErrorMessage.style.display = 'none';
+
+    // Vérifier si le montant envoyé est inférieur ou égal à 500
+    if (amountSent <= 500) {
+        event.preventDefault(); // Empêche la soumission du formulaire
+        errorMessage.style.display = 'block'; // Affiche le message d'erreur
+    } 
+    // Vérifier si le montant envoyé dépasse le solde actuel
+    else if (amountSent > currentBalance) {
+        event.preventDefault(); // Empêche la soumission du formulaire
+        balanceErrorMessage.style.display = 'block'; // Affiche le message d'erreur
+    }
+
+    // Vérifier si le montant reçu est inférieur ou égal à 500
+    if (amountReceived <= 500) {
+        event.preventDefault(); // Empêche la soumission du formulaire
+        receivedAmountError.style.display = 'block'; // Affiche le message d'erreur
+    }
+
+    // Vérifier si le montant reçu dépasse le solde actuel
+    if (amountReceived >= currentBalance) {
+        event.preventDefault(); // Empêche la soumission du formulaire
+        receivedBalanceErrorMessage.style.display = 'block'; // Affiche le message d'erreur
+    }
+
+    // Si tout est valide, mettre à jour les soldes ici
+    // Tu peux ajouter une logique pour soustraire le montant envoyé et ajouter le montant reçu.
+});
+
+// Écouteurs d'événements pour mettre à jour automatiquement les champs
+document.getElementById('montant_envoye').addEventListener('input', function() {
+    const amountSent = parseFloat(this.value);
+    const amountReceivedField = document.getElementById('montant_recu');
+    
+    // Calculer le montant reçu
+    if (!isNaN(amountSent)) {
+            const amountReceived = Math.round(amountSent * 0.98);
+        amountReceivedField.value = amountReceived.toFixed(2); // Mettre à jour le champ 'Montant reçu'
+    } else {
+        amountReceivedField.value = '';
+    }
+
+    // Vérifier et masquer les messages d'erreur en fonction du montant
+    const errorMessage = document.getElementById('errorMessage');
+    const balanceErrorMessage = document.getElementById('balanceErrorMessage');
+
+    if (amountSent > 500 || isNaN(amountSent)) {
+        errorMessage.style.display = 'none';
+    } else {
+        errorMessage.style.display = 'block'; // Montant invalide
+    }
+
+    const currentBalance = {{ $compte ? $compte->solde : 0 }};
+    if (amountSent <= currentBalance || isNaN(amountSent)) {
+        balanceErrorMessage.style.display = 'none';
+    } else {
+        balanceErrorMessage.style.display = 'block'; // Montant invalide
+    }
+});
+
+// Écouteur d'événements pour mettre à jour le montant envoyé
+document.getElementById('montant_recu').addEventListener('input', function() {
+    const amountReceived = parseFloat(this.value);
+    const amountSentField = document.getElementById('montant_envoye');
+
+    // Calculer le montant envoyé
+    if (!isNaN(amountReceived)) {
+        const amountSent = Math.round(amountReceived / 0.98);
+        amountSentField.value = amountSent.toFixed(2); // Mettre à jour le champ 'Montant envoyé'
+    } else {
+        amountSentField.value = '';
+    }
+
+    // Vérifier et masquer les messages d'erreur en fonction du montant
+    const receivedAmountError = document.getElementById('receivedAmountError');
+    const receivedBalanceErrorMessage = document.getElementById('receivedBalanceErrorMessage');
+
+    if (amountReceived > 500 || isNaN(amountReceived)) {
+        receivedAmountError.style.display = 'none';
+    } else {
+        receivedAmountError.style.display = 'block'; // Montant invalide
+    }
+
+    const currentBalance = {{ $compte ? $compte->solde : 0 }};
+    if (amountReceived < currentBalance || isNaN(amountReceived)) {
+        receivedBalanceErrorMessage.style.display = 'none';
+    } else {
+        receivedBalanceErrorMessage.style.display = 'block'; // Montant invalide
+    }
+});
 </script>
+
 
         </div>
     </div>
