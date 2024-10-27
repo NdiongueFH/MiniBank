@@ -33,8 +33,8 @@
                             <table class="table table-striped table-hover table-sm">
                                 <thead>
                                     <tr>
-                                        <th>Nom du Receveur</th>
-                                        <th>Prénom du Receveur</th>
+                                        <th>Nom</th>
+                                        <th>Prénom</th>
                                         <th>Montant</th>
                                         <th>Date</th>
                                         <th>Type</th>  
@@ -59,24 +59,13 @@
         </div>
     </div>
 
-    {{-- <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">Transfert Rapide</div>
-                <div class="card-body">
-                    <p class="text-muted">Contenu du Transfert Rapide</p>
-                </div>
-            </div>
-        </div> --}}
-
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">Plafonds du Compte</div>
-                <div class="card-body">
-                    <p>Solde Maximum pour votre Compte : <strong>{{ number_format($plafondsCompte['solde_maximum'], 0, ',', ' ') }} FCFA</strong></p>
-                    <p>Cumul Mensuel Maximum : <strong>{{ number_format($plafondsCompte['cumul_mensuel_maximum'], 0, ',', ' ') }} FCFA</strong></p>
-                    <p>Cumul Maximum Restant : <strong>{{ number_format($plafondsCompte['cumul_maximum_restant'], 0, ',', ' ') }} FCFA</strong></p>
-                </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">Plafonds du Compte</div>
+            <div class="card-body">
+                <p>Solde Maximum pour votre Compte : <strong>{{ number_format($plafondsCompte['solde_maximum'], 0, ',', ' ') }} FCFA</strong></p>
+                <p>Cumul Mensuel Maximum : <strong>{{ number_format($plafondsCompte['cumul_mensuel_maximum'], 0, ',', ' ') }} FCFA</strong></p>
+                <p>Cumul Maximum Restant : <strong>{{ number_format($plafondsCompte['cumul_maximum_restant'], 0, ',', ' ') }} FCFA</strong></p>
             </div>
         </div>
     </div>
@@ -85,7 +74,7 @@
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">Activités Mensuelles</div>
-                <div class="card-body">
+                <div class="card-body" style="height: 400px;"> <!-- Définir la hauteur ici -->
                     <canvas id="monthlyActivitiesChart"></canvas>
                 </div>
             </div>
@@ -134,7 +123,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: false, // Important pour s'adapter à la taille du conteneur
                 scales: {
                     y: {
                         beginAtZero: true,

@@ -15,9 +15,7 @@ Route::get('/', function () {
 Route::get('/dashboard/data', [UserController::class, 'getDashboardData'])->name('dashboard.data');
 
 
-// Ajoutez cette route dans vos fichiers de routes
-Route::get('/distributeur/dashboard', [UserController::class, 'showDashboard'])->name('distributeur.dashboard');
-
+  
 Route::get('/side-navC', function () {
     return view('layouts.sidebar-navbarC'); // afficheage sidebar et navbar
 });

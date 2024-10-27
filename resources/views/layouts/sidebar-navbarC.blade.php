@@ -12,7 +12,7 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body>
+<body style="background-color: #E5E5E5;">
 
     <!-- Sidebar -->
     <div class="d-flex" style="height: 100vh;">
@@ -65,9 +65,12 @@
 
                 <!-- Déconnexion button (aligned at the bottom) -->
                 <div class="mt-auto mb-3 px-3">
-                    <button class="btn btn-secondary w-100" style="background-color: #505887; color: white;">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf <!-- Protection contre les attaques CSRF -->                    
+                        <button class="btn btn-secondary w-100" style="background-color: #505887; color: white;">
                         <i class="bi bi-box-arrow-left"></i> Déconnexion
-                    </button>
+                        </button>
+                        </form>
                 </div>
             </div>
         </nav>
@@ -113,8 +116,8 @@
             <!-- Dashboard Content -->
             <div class="container mt-4">
                 <h1>Dashboard Client</h1>
-                <p>Bienvenue sur le tableau de bord de MiniBank.</p>
-                <!-- Ajouter d'autres contenus ici -->
+                <h2>Bienvenue, {{ auth()->user()->prenom }} !</h2>
+                @yield('containerC')
             </div>
         </div>
     </div>
