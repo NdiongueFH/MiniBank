@@ -120,47 +120,56 @@
 
             <h2 class="titre" style="margin-left: 50px; margin-top: 20px;">Ma carte</h2>
 
-          <!-- Bloc de la taille d'une carte bancaire -->
-<div class="carte" style="width: 800px; height: 280px; background-color: #f8f9fa; border: 1px solid #ced4da; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-left: 50px; margin-top: 20px;">
-    <!-- Contenu du bloc (comme un numéro de carte, nom, etc.) -->
-    <div class="p-3">
-        <p>Solde</p>
-        <h5>{{ $compte ? number_format($compte->solde, 0) : '0' }} FCFA</h5><br>
-        <p>Nom d'utilisateur</p>
-        <h5>{{ $client->prenom }} {{ $client->nom }}</h5>
-    </div>
+        <!-- Bloc de la taille d'une carte bancaire -->
+        <div class="carte" style="width: 800px; height: 310px; background-color: #f8f9fa; border: 1px solid #ced4da; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-left: 50px; margin-top: 20px;">
 
-    <!-- Trait fin -->
-    <hr style="border: 1px solid #ced4da; margin: 0;">
+            <!-- Conteneur principal avec Flexbox pour aligner les éléments -->
+            <div style="display: flex; align-items: center; padding: 20px;">
 
-    <!-- Numéro de téléphone -->
-    <div class="p-3 d-flex justify-content-between align-items-center">
-        <h5>{{ $client->telephone }}</h5>
-        <img src="{{ asset('images/num.png') }}" alt="Icône Téléphone" style="width: 70px; height: 50px; margin-left: 10px;">
-    </div>
+                <!-- Informations du client à gauche -->
+                <div class="p-3" style="margin-right: 250px;">
+                    <p>Solde</p>
+                    <h5>{{ $compte ? number_format($compte->solde, 0) : '0' }} FCFA</h5><br>
+                    <p>Nom d'utilisateur</p>
+                    <h5>{{ $client->prenom }} {{ $client->nom }}</h5>
+                </div>
 
-    <!-- Message d'alerte -->
-    @if(session('message'))
-        <div style="margin-top: 10px; color: {{ session('message_type') == 'success' ? 'green' : 'red' }};">
-            {{ session('message') }}
+                <!-- QR Code à droite -->
+                <div class="p-3">
+                    <img src="{{ asset('storage/' . $qrCodePath) }}" alt="QR Code du Client" style="width: 200px; height: 150px;">
+                </div>
+            </div>
+
+            <!-- Ligne de séparation -->
+            <hr style="border: 1px solid #ced4da; margin: 0;">
+
+            <!-- Numéro de téléphone en dessous -->
+            <div class="p-3 d-flex justify-content-between align-items-center">
+                <h5>{{ $client->telephone }}</h5>
+                <img src="{{ asset('images/num.png') }}" alt="Icône Téléphone" style="width: 70px; height: 50px; margin-left: 10px;">
+            </div>
+
+            <!-- Message d'alerte -->
+            @if(session('message'))
+                <div style="margin-top: 10px; color: {{ session('message_type') == 'success' ? 'green' : 'red' }};">
+                    {{ session('message') }}
+                </div>
+
+                <script>
+                    setTimeout(function() {
+                        var messageDiv = document.querySelector('div[style*="margin-top: 10px"]');
+                        if (messageDiv) {
+                            messageDiv.style.transition = 'opacity 0.5s ease';
+                            messageDiv.style.opacity = '0';
+                            setTimeout(function() {
+                                messageDiv.style.display = 'none';
+                            }, 500);
+                        }
+                    }, 5000);
+                </script>
+            @endif
         </div>
 
-        <script>
-            // Fonction pour masquer le message après 5 secondes
-            setTimeout(function() {
-                var messageDiv = document.querySelector('div[style*="margin-top: 10px"]'); // Sélectionne le message
-                if (messageDiv) {
-                    messageDiv.style.transition = 'opacity 0.5s ease'; // Ajoute une transition
-                    messageDiv.style.opacity = '0'; // Change l'opacité à 0
-                    setTimeout(function() {
-                        messageDiv.style.display = 'none'; // Cache l'élément après la transition
-                    }, 500); // Temps de la transition
-                }
-            }, 5000); // 5000 millisecondes = 5 secondes
-        </script>
-    @endif
-
-</div>
 
 
       <!-- Bloc de transfert -->

@@ -11,33 +11,51 @@ use App\Models\Transaction;
 use App\Models\Compte;
 use App\Models\User;
 use App\Models\Client;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
 
 class ClientController extends Controller
 {
+    
     public function index()
     {
         // Récupérer l'utilisateur connecté
         $client = auth()->user();
-
+    
         // Récupérer le compte associé à l'utilisateur
         $compte = Compte::where('user_id', $client->id)->first();
-
-        // Récupérer les transactions où le client est le receveur ou l'émetteur
+    
+        // Contenu du QR code avec des informations structurées
+        $clientInfo = "Nom: {$client->nom}\n" .
+                      "Prénom: {$client->prenom}\n" .
+                      "Téléphone: {$client->telephone}\n" .
+                      "Numéro de compte: {$client->num_compte}\n" .
+                      "Statut: " . ($client->blocked ? 'Bloqué' : 'Actif');
+    
+        // Générer le QR code avec un format plus grand
+        $qrCodePath = 'qrcodes/client_qrcode.png';
+        QrCode::format('png')
+            ->size(300) // Taille plus grande pour plus de clarté
+            ->generate($clientInfo, storage_path("app/public/{$qrCodePath}"));
+    
+        // Récupérer les transactions du client
         $transactions = Transaction::where(function($query) use ($client) {
-            $query->where('receveur_id', $client->id)
-                  ->orWhere('emettteur_id', $client->id);
-        })
-        ->with('distributeur') // Charge les détails du distributeur
-        ->orderBy('created_at', 'desc') // Tri par date décroissante
-        ->get();
-
+                $query->where('receveur_id', $client->id)
+                      ->orWhere('emettteur_id', $client->id);
+            })
+            ->with('distributeur')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
         // Passer les informations à la vue
         return view('transactions', [
             'client' => $client,
             'transactions' => $transactions,
             'compte' => $compte,
+            'qrCodePath' => $qrCodePath,
         ]);
     }
+
 
     public function search(Request $request)
     {
