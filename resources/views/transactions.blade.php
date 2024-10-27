@@ -13,11 +13,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-    <!-- @if(session('message'))
-        <div class="alert alert-{{ session('message_type') == 'success' ? 'success' : 'danger' }}">
-            {{ session('message') }}
-        </div>
-    @endif -->
     
     <!-- Sidebar -->
     <div class="d-flex" style="height: 100vh;">
@@ -81,7 +76,7 @@
         </nav>
 
         <!-- Main content -->
-        <div class="main-content flex-grow-1" style="margin-left: 240px; width: calc(100% - 240px);">
+        <div class="main-content flex-grow-1" style="margin-left: 240px; width: calc(100% - 240px); ">
             <!-- Navbar -->
             <nav class="navbar navbar-expand-lg navbar-light bg-primary">
                 <div class="container-fluid">
@@ -121,7 +116,7 @@
             <h2 class="titre" style="margin-left: 50px; margin-top: 20px;">Ma carte</h2>
 
         <!-- Bloc de la taille d'une carte bancaire -->
-        <div class="carte" style="width: 800px; height: 310px; background-color: #f8f9fa; border: 1px solid #ced4da; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-left: 50px; margin-top: 20px;">
+        <div class="carte" style="width: 800px; height: 310px; background-color: #C0DFFF; border: 1px solid #ced4da; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-left: 50px; margin-top: 20px;">
 
             <!-- Conteneur principal avec Flexbox pour aligner les éléments -->
             <div style="display: flex; align-items: center; padding: 20px;">
@@ -141,7 +136,7 @@
             </div>
 
             <!-- Ligne de séparation -->
-            <hr style="border: 1px solid #ced4da; margin: 0;">
+            <hr style="border: 1px solid #000000; margin: 0;">
 
             <!-- Numéro de téléphone en dessous -->
             <div class="p-3 d-flex justify-content-between align-items-center">
@@ -342,7 +337,7 @@ document.getElementById('montant_recu').addEventListener('input', function() {
     <!-- Titre des transactions -->
     <h3 style="margin-left: 300px; margin-top: -440px;">Liste des Transactions</h3>
 
-    <div class="transactions" style="width: 1500px; height: 350px; background-color: #f8f9fa; border: 1px solid #ced4da; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-left: 300px; margin-top: 5px; padding: 20px; overflow-y: auto;">
+    <div class="transactions" style="width: 1500px; height: 350px; background-color: #ffffff; border: 1px solid #ced4da; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-left: 300px; margin-top: 5px; padding: 20px; overflow-y: auto;">
     <table class="table table-bordered" style="min-width: 100%;">
     <thead>
         <tr>
