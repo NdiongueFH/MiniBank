@@ -467,54 +467,66 @@ document.getElementById('depositForm').addEventListener('submit', function(event
 
 
 <script>
-    document.getElementById('withdrawalAccount').addEventListener('input', function() {
-        const accountNumber = this.value;
+// Vérification du numéro de compte lors de la saisie
+document.getElementById('withdrawalAccount').addEventListener('input', function() {
+    const accountNumber = this.value;
+    const accountErrorMessage = document.getElementById('accountErrorMessage');
 
-        if (accountNumber.length >= 5) { // Vérifiez si le numéro de compte est valide
-            fetch(`/api/get-account-info/${accountNumber}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.success) {
-                        alert(data.message); // Affichez le message d'erreur
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur lors de la récupération des informations :', error);
-                });
-        }
-    });
+    // Réinitialiser le message d'erreur
+    accountErrorMessage.style.display = 'none';
 
-    document.getElementById('withdrawalForm').addEventListener('submit', function(event) {
-        const amount = parseFloat(document.getElementById('withdrawalAmount').value);
-        const withdrawalErrorMessage = document.getElementById('withdrawalErrorMessage');
-        const withdrawalBalanceErrorMessage = document.getElementById('withdrawalBalanceErrorMessage');
+    if (accountNumber.length >= 5) { // Vérifiez si le numéro de compte est valide
+        fetch(`/api/get-account-info/${accountNumber}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    accountErrorMessage.style.display = 'block'; // Affiche le message d'erreur
+                    accountErrorMessage.textContent = data.message; // Affichez le message d'erreur
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des informations :', error);
+            });
+    }
+});
 
-        // Réinitialiser les messages d'erreur
-        withdrawalErrorMessage.style.display = 'none';
-        withdrawalBalanceErrorMessage.style.display = 'none';
+// Gestion de la soumission du formulaire de retrait
+document.getElementById('withdrawalForm').addEventListener('submit', function(event) {
+    const amount = parseFloat(document.getElementById('withdrawalAmount').value);
+    const withdrawalErrorMessage = document.getElementById('withdrawalErrorMessage');
+    const withdrawalBalanceErrorMessage = document.getElementById('withdrawalBalanceErrorMessage');
+    const currentBalance = {{ $compte ? $compte->solde : 0 }}; // Récupérez le solde actuel
 
-        // Debugging: afficher les valeurs
-        console.log('Montant à retirer:', amount);
+    // Réinitialiser les messages d'erreur
+    withdrawalErrorMessage.style.display = 'none';
+    withdrawalBalanceErrorMessage.style.display = 'none';
 
-        // Vérifier si le montant est inférieur à 1000
-        if (amount < 1000) {
-            event.preventDefault(); // Empêche la soumission du formulaire
-            withdrawalErrorMessage.style.display = 'block'; // Affiche le message d'erreur
-        } 
-        // Vérifier si le montant dépasse le solde du client (si nécessaire, vous pouvez gérer cela ici)
-        // Vous aurez besoin d'ajouter une logique pour obtenir le solde ici si vous le souhaitez
-    });
+    // Debugging: afficher les valeurs
+    console.log('Montant à retirer:', amount);
 
-    // Masquer les messages d'erreur lors de la saisie
-    document.getElementById('withdrawalAmount').addEventListener('input', function() {
-        const amount = parseFloat(this.value);
-        const withdrawalErrorMessage = document.getElementById('withdrawalErrorMessage');
-        const withdrawalBalanceErrorMessage = document.getElementById('withdrawalBalanceErrorMessage');
+    // Vérifier si le montant est inférieur à 1000
+    if (amount < 1000) {
+        event.preventDefault(); // Empêche la soumission du formulaire
+        withdrawalErrorMessage.style.display = 'block'; // Affiche le message d'erreur
+        withdrawalErrorMessage.textContent = "*Le montant à retirer doit être supérieur ou égal à 1000.";
+    } 
+    // Vérifier si le montant dépasse le solde du client
+    else if (amount > currentBalance) {
+        event.preventDefault(); // Empêche la soumission du formulaire
+        withdrawalBalanceErrorMessage.style.display = 'block'; // Affiche le message d'erreur
+        withdrawalBalanceErrorMessage.textContent = "*Le montant dépasse votre solde disponible.";
+    }
+});
 
-        // Vérifier si le montant est valide
-        withdrawalErrorMessage.style.display = (amount >= 1000) ? 'none' : 'block';
-        // Vous pouvez également gérer la vérification du solde ici si nécessaire
-    });
+// Masquer les messages d'erreur lors de la saisie dans le champ de montant
+document.getElementById('withdrawalAmount').addEventListener('input', function() {
+    const amount = parseFloat(this.value);
+    const withdrawalErrorMessage = document.getElementById('withdrawalErrorMessage');
+
+    // Vérifier si le montant est valide
+    withdrawalErrorMessage.style.display = (amount >= 1000) ? 'none' : 'block';
+});
+
 </script>
 
 <script>
