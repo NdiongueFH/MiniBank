@@ -13,7 +13,7 @@ class AgentController extends Controller
     public function index()
     {
         // Afficher le tableau de bord des agents
-        return view('agents.dashboard');
+        return view('dashboard.agent');
     }
 
     public function createDistributeur(Request $request)

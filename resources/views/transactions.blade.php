@@ -12,7 +12,7 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body>
+<body >
     
     <!-- Sidebar -->
     <div class="d-flex" style="height: 100vh;">
@@ -26,13 +26,14 @@
                 <!-- Navigation Links -->
                 <ul class="nav flex-column flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#" style="font-size: 1.25rem; color: #505887;">
+                        <a class="nav-link active" aria-current="page" href="{{ route('dashboard.client') }}" style="font-size: 1.25rem; color: #505887;">
                             <i class="bi bi-house-door"></i>
                             Dashboard
                         </a>
+
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" style="font-size: 1.25rem; color: #505887;">
+                        <a class="nav-link" href="{{ route('client.dashboard') }}" style="font-size: 1.25rem; color: #505887;">
                             <i class="bi bi-card-list"></i>
                             Transactions
                         </a>
@@ -116,54 +117,82 @@
             <h2 class="titre" style="margin-left: 50px; margin-top: 20px;">Ma carte</h2>
 
         <!-- Bloc de la taille d'une carte bancaire -->
-        <div class="carte" style="width: 800px; height: 310px; background-color: #C0DFFF; border: 1px solid #ced4da; border-radius: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-left: 50px; margin-top: 20px;">
-
-            <!-- Conteneur principal avec Flexbox pour aligner les éléments -->
-            <div style="display: flex; align-items: center; padding: 20px;">
-
-                <!-- Informations du client à gauche -->
-                <div class="p-3" style="margin-right: 250px;">
-                    <p>Solde</p>
-                    <h5>{{ $compte ? number_format($compte->solde, 0) : '0' }} FCFA</h5><br>
-                    <p>Nom d'utilisateur</p>
-                    <h5>{{ $client->prenom }} {{ $client->nom }}</h5>
+        <div class="card shadow-sm"  style="width: 700px; margin-left: 50px; border-radius: 20px; height: 350px">
+                <!-- <div class="card-header bg-primary text-white">Ma carte</div> -->
+                <div class="card-body" style="width: 400px; margin-left: 40px;">                    
+                    <!-- Affichage du solde avec un bouton pour masquer/afficher le montant -->
+                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <span class="h5 me-3">Solde : 
+                            <span id="solde">{{ number_format($solde, 0, ',', ' ') }} FCFA</span>
+                        </span>
+                        <button class="btn btn-outline-secondary btn-sm" id="toggleSolde">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- QR Code à droite -->
-                <!-- <div class="p-3">
-                    <img src="{{ asset('storage/' . $qrCodePath) }}" alt="QR Code du Client" style="width: 200px; height: 150px;">
-                </div> -->
-            </div>
 
-            <!-- Ligne de séparation -->
-            <hr style="border: 1px solid #000000; margin: 0;">
+                   
 
-            <!-- Numéro de téléphone en dessous -->
-            <div class="p-3 d-flex justify-content-between align-items-center">
-                <h5>{{ $client->telephone }}</h5>
-                <img src="{{ asset('images/num.png') }}" alt="Icône Téléphone" style="width: 70px; height: 50px; margin-left: 10px;">
-            </div>
+                    
+                    <!-- Affichage du numéro de compte -->
+                    <p class="mt-3">Numéro de compte : <strong>{{ $numCompte }}</strong></p>
+                    
+                    <!-- QR Code du compte -->
+                    <div class="text-center">
+                        <img id="qrCode" src="data:image/png;base64,{!! $qrCode !!}" alt="QR Code" style="max-width: 100px; transition: filter 0.3s;" />
+                        <p>Scannez ce code pour votre numéro de compte.</p>
+                    </div>
 
-            <!-- Message d'alerte -->
-            @if(session('message'))
-                <div style="margin-top: 10px; color: {{ session('message_type') == 'success' ? 'green' : 'red' }};">
-                    {{ session('message') }}
-                </div>
+                    <!-- Ligne de séparation -->
+                    <hr style="border: 1px solid #000000; margin: 0; width: 600px;">
+                    <h5 class="mb-0 text-end ms-3"> {{ $client->prenom }} {{ $client->nom }}</h5> <!-- Ajout de ms-3 -->
+ 
+                    <!-- Numéro de téléphone en dessous -->
+                    <div class="p-3 d-flex justify-content-between align-items-center">
+                        <h5>{{ $client->telephone }}</h5>
 
+                        <img src="{{ asset('images/num.png') }}" alt="Icône Téléphone" style="width: 80px; height: 60px; margin-left: 50px;">                    </div>
+
+ </div>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                 <script>
-                    setTimeout(function() {
-                        var messageDiv = document.querySelector('div[style*="margin-top: 10px"]');
-                        if (messageDiv) {
-                            messageDiv.style.transition = 'opacity 0.5s ease';
-                            messageDiv.style.opacity = '0';
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var soldeElement = document.getElementById('solde');
+                        var toggleButton = document.getElementById('toggleSolde');
+                        var qrCodeElement = document.getElementById('qrCode');
+                        
+                        // Fonction pour masquer/afficher le solde
+                        var soldeVisible = true;
+                        toggleButton.addEventListener('click', function() {
+                            soldeElement.style.visibility = soldeVisible ? 'hidden' : 'visible';
+                            toggleButton.querySelector('i').classList.toggle('fa-eye-slash', soldeVisible);
+                            toggleButton.querySelector('i').classList.toggle('fa-eye', !soldeVisible);
+                            soldeVisible = !soldeVisible;
+                        });
+                        
+                        // Mise à jour du QR code toutes les 30 secondes
+                        setInterval(function() {
+                            qrCodeElement.style.filter = 'blur(4px)';
+
                             setTimeout(function() {
-                                messageDiv.style.display = 'none';
-                            }, 500);
-                        }
-                    }, 5000);
+                                $.get('/generate-qr-code', function(data) {
+                                    qrCodeElement.src = 'data:image/png;base64,' + data.qrCode;
+                                });
+
+                                setTimeout(function() {
+                                    qrCodeElement.style.filter = 'blur(0)';
+                                }, 300);
+                            }, 300);
+                        }, 30000);
+
+                    });
                 </script>
-            @endif
-        </div>
+
+
+            </div>
 
 
 
@@ -440,20 +469,7 @@ document.getElementById('montant_recu').addEventListener('input', function() {
     });
 </script>
 
-        <!-- Pagination -->
-        <div class="pagination" style="margin-top: 20px; display: flex; justify-content: flex-end; margin-right: 50px;">
-        <a href="#" style="color: #2D60FF; text-decoration: none; margin-right: 10px;">
-            <i class="bi bi-arrow-left"></i> Précédent
-        </a>
-        <div style="margin: 0 10px;">
-            <a href="#" style="cursor: pointer; color: #2D60FF; text-decoration: none;">1</a>
-            <a href="#" style="cursor: pointer; margin: 0 5px; color: #2D60FF; text-decoration: none;">2</a>
-            <a href="#" style="cursor: pointer; margin: 0 5px; color: #2D60FF; text-decoration: none;">3</a>
-            <a href="#" style="cursor: pointer; margin: 0 5px; color: #2D60FF; text-decoration: none;">4</a>
-        </div>
-        <a href="#" style="color: #2D60FF; text-decoration: none; margin-left: 10px;">
-            Suivant <i class="bi bi-arrow-right"></i>
-        </a>
+       
 </div>
 
    

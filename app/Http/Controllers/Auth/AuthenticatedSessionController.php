@@ -37,11 +37,11 @@ class AuthenticatedSessionController extends Controller
             $user = Auth::user();
             switch ($user->role) {
                 case 'agent':
-                    return redirect()->route('dashboard.agent');
+                    return redirect()->route('dashboard.agent1');
                 case 'distributeur':
-                    return redirect()->route('distributeur.transactions');
+                    return redirect()->route('dashboard.distributeur');
                 case 'client':
-                    return redirect()->route('client.transactions'); // Redirection vers la vue des transactions                    
+                    return redirect()->route('dashboard.client'); // Redirection vers la vue des transactions                    
             }
         }
 

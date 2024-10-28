@@ -26,17 +26,23 @@ class ClientController extends Controller
         $compte = Compte::where('user_id', $client->id)->first();
     
         // Contenu du QR code avec des informations structurées
-        // $clientInfo = "Nom: {$client->nom}\n" .
-        //               "Prénom: {$client->prenom}\n" .
-        //               "Téléphone: {$client->telephone}\n" .
-        //               "Numéro de compte: {$client->num_compte}\n" .
-        //               "Statut: " . ($client->blocked ? 'Bloqué' : 'Actif');
+        $clientInfo = "Nom: {$client->nom}\n" .
+                      "Prénom: {$client->prenom}\n" .
+                      "Téléphone: {$client->telephone}\n" .
+                      "Numéro de compte: {$client->num_compte}\n" .
+                      "Statut: " . ($client->blocked ? 'Bloqué' : 'Actif');
     
         // Générer le QR code avec un format plus grand
         // $qrCodePath = 'qrcodes/client_qrcode.png';
         // QrCode::format('png')
         //     ->size(300) // Taille plus grande pour plus de clarté
         //     ->generate($clientInfo, storage_path("app/public/{$qrCodePath}"));
+
+        // Récupération du solde actuel du compte du client
+        $solde = $compte->solde;
+
+        // Génération d'un code QR pour le numéro de compte du client
+        $qrCodeImage = QrCode::format('png')->size(200)->generate($client->num_compte);
     
         // Récupérer les transactions du client
         $transactions = Transaction::where(function($query) use ($client) {
@@ -51,10 +57,21 @@ class ClientController extends Controller
         return view('transactions', [
             'client' => $client,
             'transactions' => $transactions,
+            'numCompte' => $client->num_compte,
+            'solde' => $solde,
             'compte' => $compte,
-            'qrCodePath' => $qrCodePath,
+            'qrCode' => base64_encode($qrCodeImage), // Encodage du QR code en base64 pour affichage
         ]);
     }
+
+    // Méthode pour générer un QR code unique pour le client
+    public function generateQrCode()
+    {
+        $client = Auth::user();
+        $qrCodeImage = QrCode::format('png')->size(200)->generate($client->num_compte . '?' . time()); // Ajout d'un timestamp pour l'unicité
+        return response()->json(['qrCode' => base64_encode($qrCodeImage)]); // Retourne le QR code en JSON
+    }
+
 
 
     public function search(Request $request)
